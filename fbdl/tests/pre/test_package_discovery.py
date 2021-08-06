@@ -16,11 +16,36 @@ class TestPackageDiscovery(unittest.TestCase):
         packages = pre.discover_packages()
 
         expected = {
-            "bar": [os.path.join(dummy_project_dir, "fbd/fbd-bar")],
-            "foo": [os.path.join(dummy_project_dir, "fbd/foo")],
+            "bar": [
+                {
+                    "Files": [
+                        "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/fbd-bar/b.fbd"
+                    ],
+                    "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/fbd-bar",
+                }
+            ],
             "baz": [
-                os.path.join(dummy_env_dir, "baz"),
-                os.path.join(dummy_project_dir, "submodules/some_lib/fbd-baz"),
+                {
+                    "Files": [
+                        "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_env/fbd/baz/d.fbd"
+                    ],
+                    "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_env/fbd/baz",
+                },
+                {
+                    "Files": [
+                        "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/submodules/some_lib/fbd-baz/c.fbd"
+                    ],
+                    "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/submodules/some_lib/fbd-baz",
+                },
+            ],
+            "foo": [
+                {
+                    "Files": [
+                        "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo/z.fbd",
+                        "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo/a.fbd",
+                    ],
+                    "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo",
+                }
             ],
         }
 

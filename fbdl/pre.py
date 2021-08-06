@@ -12,6 +12,28 @@ from pprint import pformat
 import sys
 
 
+def check_path(path, packages):
+    print(path)
+    pkg_name = ""
+    files = []
+    for f in os.listdir(path):
+        file_path = os.path.join(path, f)
+        if os.path.isfile(file_path) and f.endswith(".fbd"):
+            if not pkg_name:
+                pkg_name = os.path.basename(path)
+                if pkg_name.startswith("fbd-"):
+                    pkg_name = pkg_name[4:]
+            files.append(file_path)
+    if pkg_name:
+        dir = {}
+        dir["Path"] = path
+        dir["Files"] = files
+        if pkg_name in packages:
+            packages[pkg_name].append(dir)
+        else:
+            packages[pkg_name] = [dir]
+
+
 def discover_packages():
     paths_to_look = []
 
@@ -41,26 +63,16 @@ def discover_packages():
         paths = [os.path.join(path_to_look, d) for d in dirs]
 
         for p in paths:
-            for f in os.listdir(p):
-                if f.endswith(".fbd"):
-                    pkg_name = os.path.basename(p)
-                    if pkg_name.startswith("fbd-"):
-                        pkg_name = pkg_name[4:]
-                    if pkg_name in packages:
-                        packages[pkg_name].append(p)
-                    else:
-                        packages[pkg_name] = [p]
+            check_path(p, packages)
 
-    for dirpath, _, _ in os.walk(cwd):
-        if dirpath.startswith(cwdfbd):
+    for p, _, _ in os.walk(cwd):
+        if p.startswith(cwdfbd):
             continue
 
-        basename = os.path.basename(dirpath)
-        if basename.startswith("fbd-"):
-            pkg_name = basename[4:]
-            if pkg_name in packages:
-                packages[pkg_name].append(dirpath)
-            else:
-                packages[pkg_name] = [dirpath]
+        basename = os.path.basename(p)
+        if not basename.startswith("fbd-"):
+            continue
+
+        check_path(p, packages)
 
     return packages
