@@ -1,0 +1,3 @@
+[submodule "submodules/tree-sitter-fbdl"]
+	path = submodules/tree-sitter-fbdl
+	url = ../tree-sitter-fbdl.git
