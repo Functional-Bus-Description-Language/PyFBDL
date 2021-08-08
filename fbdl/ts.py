@@ -5,7 +5,7 @@ import sys
 
 thismodule = sys.modules[__name__]
 
-from tree_sitter import Language, Parser
+from tree_sitter import Language, Parser, TreeCursor
 
 Language.build_library('build/fbdl.so', ['submodules/tree-sitter-fbdl/'])
 
@@ -13,6 +13,18 @@ FBDLANG = Language('build/fbdl.so', 'fbdl')
 
 parser = Parser()
 parser.set_language(FBDLANG)
+
+
+class Cursor:
+    def __init__(self, tree, code):
+        self.code = code
+        self.tc = tree.walk()
+
+    def __getattr__(self, name):
+        return self.tc.__getattribute__(name)
+
+    def get_node_value(self, node):
+        return self.code[node.start_byte : node.end_byte].decode('utf8')
 
 
 def parse(packages):
@@ -35,8 +47,7 @@ def parse_file(f):
     code = bytes(f.read(), 'utf8')
 
     tree = parser.parse(code)
-    cursor = tree.walk()
-    c = cursor
+    cursor = Cursor(tree, code)
 
     if cursor.goto_first_child() == False:
         return symbols
@@ -45,11 +56,13 @@ def parse_file(f):
         node_type = cursor.node.type
         # Imports have to be handled in different way, as they are not classical symbols.
         if node_type == 'single_import_statement':
-            parse_single_import_statement(cursor, code)
+            parse_single_import_statement(cursor)
         else:
-            name, symbol = getattr(thismodule, 'parse_' + node_type)(cursor, code)
+            name, symbol = getattr(thismodule, 'parse_' + node_type)(cursor)
             if name and name in symbols:
-                raise Exception(f"Symbol '{name}' defined at least twice in file 'f.name'.")
+                raise Exception(
+                    f"Symbol '{name}' defined at least twice in file 'f.name'."
+                )
             elif name:
                 symbols[name] = symbol
 
@@ -59,19 +72,17 @@ def parse_file(f):
     return symbols
 
 
-def parse_element_anonymous_instantiation(cursor, code):
+def parse_element_anonymous_instantiation(cursor):
+    symbol = {'Kind': 'Element'}
     return None, None
 
 
-def parse_single_constant_definition(cursor, code):
-    symbol = {'Kind' : 'constant'}
-    name_node = cursor.node.children[1]
-    name = code[name_node.start_byte:name_node.end_byte].decode('utf8')
-    print(name)
-    print(symbol)
+def parse_single_constant_definition(cursor):
+    symbol = {'Kind': 'Constant'}
+    name = cursor.get_node_value(cursor.node.children[1])
 
     return name, symbol
 
 
-def parse_single_import_statement(cursor, code):
+def parse_single_import_statement(cursor):
     return None, None
