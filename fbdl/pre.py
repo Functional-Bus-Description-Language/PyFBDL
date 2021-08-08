@@ -31,8 +31,8 @@ def check_path(path, packages):
             raise Exception(f"Package can not be named 'main': {path}.")
 
         dir = {}
-        dir["Path"] = path
-        dir["Files"] = files
+        dir['Path'] = path
+        dir['Files'] = files
         if pkg_name in packages:
             packages[pkg_name].append(dir)
         else:
@@ -43,16 +43,16 @@ def discover_packages():
     paths_to_look = []
 
     cwd = os.getcwd()
-    cwdfbd = os.path.join(cwd, "fbd")
+    cwdfbd = os.path.join(cwd, 'fbd')
     if os.path.exists(cwdfbd):
         paths_to_look.append(cwdfbd)
 
-    fbdpath = os.getenv("FBDPATH")
+    fbdpath = os.getenv('FBDPATH')
     if fbdpath:
-        paths_to_look += fbdpath.split(":")
+        paths_to_look += fbdpath.split(':')
 
-    if sys.platform == "linux":
-        home = os.getenv("$HOME")
+    if sys.platform == 'linux':
+        home = os.getenv('$HOME')
         if home:
             homefbd = os.path.join(home, ".local/lib/fbd")
             if homefbd:
@@ -76,7 +76,7 @@ def discover_packages():
             continue
 
         basename = os.path.basename(p)
-        if not basename.startswith("fbd-"):
+        if not basename.startswith('fbd-'):
             continue
 
         check_path(p, packages)
@@ -90,7 +90,9 @@ def get_indent(line):
         if char == '\t':
             indent += 1
         elif char == ' ':
-            raise Exception("Space character ' ' is not allowed in indent. Use tab character '\t'.")
+            raise Exception(
+                "Space character ' ' is not allowed in indent. Use tab character '\t'."
+            )
         else:
             break
     return indent
@@ -101,7 +103,9 @@ def check_indent(file_):
     for i, line in enumerate(file_):
         indent = get_indent(line)
         if indent > current_indent + 1:
-            raise Exception(f"Multi indent detected. File '{file_.name}', line number {i + 1}.")
+            raise Exception(
+                f"Multi indent detected. File '{file_.name}', line number {i + 1}."
+            )
         current_indent = indent
 
 
@@ -116,7 +120,9 @@ def add_main_file(main, packages):
         Package dictionary.
     """
     packages['main'] = []
-    packages['main'].append({'Files' : [{'Path' : main, 'Handle' : open(main, encoding='UTF-8')}]})
+    packages['main'].append(
+        {'Files': [{'Path': main, 'Handle': open(main, encoding='UTF-8')}]}
+    )
 
 
 def prepare_packages(main):

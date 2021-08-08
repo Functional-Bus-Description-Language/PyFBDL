@@ -18,35 +18,35 @@ class TestPackageDiscovery(unittest.TestCase):
         packages = pre.discover_packages()
 
         expected = {
-            "bar": [
+            'bar': [
                 {
-                    "Files": [
+                    'Files': [
                         {'Path' : "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/fbd-bar/b.fbd"}
                     ],
-                    "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/fbd-bar",
+                    'Path': "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/fbd-bar",
                 }
             ],
-            "baz": [
+            'baz': [
                 {
-                    "Files": [
+                    'Files': [
                         {'Path' : "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_env/fbd/baz/d.fbd"}
                     ],
-                    "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_env/fbd/baz",
+                    'Path': "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_env/fbd/baz",
                 },
                 {
-                    "Files": [
+                    'Files': [
                         {'Path' : "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/submodules/some_lib/fbd-baz/c.fbd"}
                     ],
-                    "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/submodules/some_lib/fbd-baz",
+                    'Path': "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/submodules/some_lib/fbd-baz",
                 },
             ],
-            "foo": [
+            'foo': [
                 {
-                    "Files": [
+                    'Files': [
                         {'Path' : "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo/z.fbd"},
                         {'Path' : "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo/a.fbd"},
                     ],
-                    "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo",
+                    'Path': "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo",
                 }
             ],
         }
