@@ -12,18 +12,24 @@ import sys
 
 
 def check_path(path, packages):
-    print(path)
     pkg_name = ""
     files = []
     for f in os.listdir(path):
+        file_ = {}
         file_path = os.path.join(path, f)
         if os.path.isfile(file_path) and f.endswith(".fbd"):
             if not pkg_name:
                 pkg_name = os.path.basename(path)
                 if pkg_name.startswith("fbd-"):
                     pkg_name = pkg_name[4:]
-            files.append(file_path)
+            file_['Path'] = file_path
+            file_['Handle'] = open(file_path, encoding='UTF-8')
+            files.append(file_)
+
     if pkg_name:
+        if pkg_name == "main":
+            raise Exception(f"Package can not be named 'main': {path}.")
+
         dir = {}
         dir["Path"] = path
         dir["Files"] = files
@@ -52,7 +58,7 @@ def discover_packages():
             if homefbd:
                 paths_to_look.append(homefbd)
     else:
-        raise Exception("%s platform is not supported, fire an issue" % sys.platform)
+        raise Exception("%s platform is not supported, fire an issue." % sys.platform)
 
     packages = {}
 
@@ -64,6 +70,7 @@ def discover_packages():
         for p in paths:
             check_path(p, packages)
 
+    log.debug(f"Looking for packages in 'fbd-' directories.")
     for p, _, _ in os.walk(cwd):
         if p.startswith(cwdfbd):
             continue
@@ -96,3 +103,42 @@ def check_indent(file_):
         if indent > current_indent + 1:
             raise Exception(f"Multi indent detected. File '{file_.name}', line number {i + 1}.")
         current_indent = indent
+
+
+def add_main_file(main, packages):
+    """Add main file to the package dictionary.
+
+    Parameters
+    ----------
+    main
+        Path to the main file.
+    packages
+        Package dictionary.
+    """
+    packages['main'] = []
+    packages['main'].append({'Files' : [{'Path' : main, 'Handle' : open(main, encoding='UTF-8')}]})
+
+
+def prepare_packages(main):
+    """
+    Parameters
+    ----------
+    main
+        Path to the main file.
+
+    Returns
+    -------
+        Package dictionary.
+    """
+    log.debug("Discovering packages.")
+    packages = discover_packages()
+
+    add_main_file(main, packages)
+    log.debug(f"Found following packages:\n{pformat(packages)}")
+
+    for package, list_ in packages.items():
+        for pkg in list_:
+            for f in pkg['Files']:
+                check_indent(f['Handle'])
+
+    return packages

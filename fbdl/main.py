@@ -1,6 +1,9 @@
 import argparse
 import logging as log
+from pprint import pformat
 import sys
+
+import pre
 
 VERSION = "0.0.0"
 
@@ -27,8 +30,8 @@ def main():
     log.basicConfig(
         level=log_levels[cmd_line_args.l], format="%(levelname)s: %(message)s", stream=sys.stderr
     )
-    log.info("Hello from fbdl!")
 
+    pre.prepare_packages(cmd_line_args.main)
 
 if __name__ == "__main__":
     main()

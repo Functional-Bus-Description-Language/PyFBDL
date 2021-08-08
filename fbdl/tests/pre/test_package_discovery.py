@@ -3,6 +3,8 @@ import os
 
 from fbdl import pre
 
+from pprint import pprint
+
 
 class TestPackageDiscovery(unittest.TestCase):
     def test_package_discovery(self):
@@ -19,7 +21,7 @@ class TestPackageDiscovery(unittest.TestCase):
             "bar": [
                 {
                     "Files": [
-                        "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/fbd-bar/b.fbd"
+                        {'Path' : "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/fbd-bar/b.fbd"}
                     ],
                     "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/fbd-bar",
                 }
@@ -27,13 +29,13 @@ class TestPackageDiscovery(unittest.TestCase):
             "baz": [
                 {
                     "Files": [
-                        "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_env/fbd/baz/d.fbd"
+                        {'Path' : "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_env/fbd/baz/d.fbd"}
                     ],
                     "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_env/fbd/baz",
                 },
                 {
                     "Files": [
-                        "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/submodules/some_lib/fbd-baz/c.fbd"
+                        {'Path' : "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/submodules/some_lib/fbd-baz/c.fbd"}
                     ],
                     "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/submodules/some_lib/fbd-baz",
                 },
@@ -41,12 +43,22 @@ class TestPackageDiscovery(unittest.TestCase):
             "foo": [
                 {
                     "Files": [
-                        "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo/z.fbd",
-                        "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo/a.fbd",
+                        {'Path' : "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo/z.fbd"},
+                        {'Path' : "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo/a.fbd"},
                     ],
                     "Path": "/home/mkru/workspace/FBDL/PyFBDL/fbdl/tests/pre/dummy_project/fbd/foo",
                 }
             ],
         }
 
-        self.assertEqual(packages, expected)
+        for package, list_ in expected.items():
+            self.assertEqual(package in packages, True)
+            for i, pkg in enumerate(list_):
+                self.assertEqual(pkg['Path'], packages[package][i]['Path'])
+                for j, f in enumerate(pkg['Files']):
+                    self.assertEqual(f['Path'], packages[package][i]['Files'][j]['Path'])
+
+        for package, list_ in packages.items():
+            for pkg in list_:
+                for f in pkg['Files']:
+                    f['Handle'].close()
