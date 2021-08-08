@@ -4,6 +4,7 @@ from pprint import pformat
 import sys
 
 import pre
+import ts
 
 VERSION = "0.0.0"
 
@@ -42,6 +43,8 @@ def main():
     )
 
     packages = pre.prepare_packages(cmd_line_args.main)
+
+    ts.parse(packages)
 
 
 if __name__ == "__main__":
