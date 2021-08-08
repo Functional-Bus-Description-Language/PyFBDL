@@ -45,7 +45,7 @@ def main():
     packages = pre.prepare_packages(cmd_line_args.main)
 
     ts.parse(packages)
-
+    log.debug(f"Packages after parsing:\n{pformat(packages)}")
 
 if __name__ == "__main__":
     main()
