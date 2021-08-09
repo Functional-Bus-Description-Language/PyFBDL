@@ -14,6 +14,7 @@ FBDLANG = Language('build/fbdl.so', 'fbdl')
 parser = Parser()
 parser.set_language(FBDLANG)
 
+import expr
 
 class Cursor:
     def __init__(self, tree, code, file_path):
@@ -144,7 +145,7 @@ def parse_single_constant_definition(cursor):
     symbol = {'Kind': 'Constant'}
     name = cursor.get_node_string(cursor.node.children[1])
 
-    expression = {'String': cursor.get_node_string(cursor.node.children[3])}
+    expression = expr.build_expression(cursor, cursor.node.children[3])
     symbol['Expression'] = expression
 
     return [(name, symbol)]
