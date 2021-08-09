@@ -55,6 +55,10 @@ class ExprDict(dict):
         elif operator == '>>':
             return  left >> right
 
+    def evaluate_identifier(self):
+        pass
+
+
 
 def build_binary_operation(cursor, node):
     bo = ExprDict(cursor, node)
@@ -71,6 +75,13 @@ def build_binary_operation(cursor, node):
     return bo
 
 
+def build_decimal_literal(cursor, node):
+    dl = ExprDict(cursor, node)
+    dl.value = int(dl['String'])
+
+    return dl
+
+
 def build_expression(cursor, node):
     e = ExprDict(cursor, node)
 
@@ -81,6 +92,13 @@ def build_expression(cursor, node):
 
     return e
 
+
+def build_identifier(cursor, node):
+    i = ExprDict(cursor, node)
+
+    i.value
+
+    return i
 
 def build_primary_expression(cursor, node):
     pe = ExprDict(cursor, node)
@@ -93,8 +111,8 @@ def build_primary_expression(cursor, node):
     return pe
 
 
-def build_decimal_literal(cursor, node):
-    dl = ExprDict(cursor, node)
-    dl.value = int(dl['String'])
+def build_true(cursor, node):
+    t = ExprDict(cursor, node)
+    t.value = True
 
-    return dl
+    return t
