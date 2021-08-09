@@ -15,29 +15,29 @@ class ExprDict(dict):
         super().__init__()
         self._value = None
 
-        self.__setitem__('String', cursor.get_node_string(node))
-        self.__setitem__('Kind', node.type)
+        self['String'] = cursor.get_node_string(node)
+        self['Kind'] = node.type
 
     @property
     def value(self):
         if self._value:
             return self._value
 
-        kind = self.__getitem__('Kind')
+        kind = self['Kind']
         if kind in ['expression', 'primary_expression']:
-            self.value = self.__getitem__('Child').value
+            self.value = self['Child'].value
         else:
             self.value = getattr(self, 'evaluate_' + kind)()
 
     @value.setter
     def value(self, v):
         self._value = v
-        self.__setitem__('Value', v)
+        self['Value'] = v
 
     def evaluate_binary_operation(self):
-        left = self.__getitem__('Left').value
-        operator = self.__getitem__('Operator')
-        right = self.__getitem__('Right').value
+        left = self['Left'].value
+        operator = self['Operator']
+        right = self['Right'].value
         if operator == '+':
             return  left + right
         elif operator == '-':
