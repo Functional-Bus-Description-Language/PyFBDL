@@ -2,10 +2,6 @@
 Module for code related with expressions.
 
 All build_* and evaluate_* functions are in alphabetical order.
-
-Some build functions call name.value before returning.
-This is a try to evluate the value during parsing.
-This makes the post parsing expression evaluations shorter.
 """
 import sys
 from pprint import pprint
@@ -28,7 +24,7 @@ class ExprDict(dict):
             return self._value
 
         kind = self['Kind']
-        if kind in ['expression', 'primary_expression']:
+        if kind in ['expression', 'parenthesized_expression', 'primary_expression']:
             self.value = self['Child'].value
         else:
             self.value = getattr(self, 'evaluate_' + kind)()
@@ -83,8 +79,6 @@ def build_binary_operation(parser, node):
     bo['Operator'] = parser.get_node_string(node.children[1])
     bo['Right'] = getattr(this_module, 'build_' + right_child.type)(parser, right_child)
 
-    bo.value
-
     return bo
 
 
@@ -136,6 +130,15 @@ def build_octal_literal(parser, node):
     ol.value = int(ol['String'], base=8)
 
     return ol
+
+
+def build_parenthesized_expression(parser, node):
+    pe = ExprDict(parser, node)
+
+    child_node = node.children[1]
+    pe['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node)
+
+    return pe
 
 
 def build_primary_expression(parser, node):
