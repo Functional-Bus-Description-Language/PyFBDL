@@ -15,6 +15,7 @@ ts_parser = Parser()
 ts_parser.set_language(FBDLANG)
 
 import expr
+import utils
 
 
 class Parser:
@@ -103,15 +104,13 @@ def parse_file(this_file, this_pkg, packages):
     parser.check_for_errors()
 
     if parser.goto_first_child() == False:
-        return symbols
+        return
 
     while True:
         node_type = parser.node.type
         # Imports have to be handled in different way, as they are not classical symbols.
         if node_type == 'single_import_statement':
             parse_single_import_statement(parser)
-        elif node_type == 'ERROR':
-            raise Exception(f"ERROR parsing file '{fh.name}'")
         else:
             for name, symbol in getattr(this_module, 'parse_' + node_type)(parser):
                 if name and name in this_file['Symbols']:
@@ -163,4 +162,25 @@ def parse_single_constant_definition(parser):
 
 
 def parse_single_import_statement(parser):
-    return [(None, None)]
+    if len(parser.node.children) == 2:
+        path_pattern = parser.get_node_string(parser.node.children[1])[1:-1]
+        as_ = path_pattern.split('/')[-1]
+        if as_.startswith('fbd-'):
+            as_ = as_[4:]
+    else:
+        path_pattern = parser.get_node_string(parser.node.children[2])[1:-1]
+        as_ = parser.get_node_string(parser.node.children[1])
+
+    actual_name = path_pattern.split('/')[-1]
+    if actual_name.startswith('fbd-'):
+        actual_name = actual_name[4:]
+
+    import_ = {'Actual Name': actual_name, 'Package': utils.get_ref_to_package(path_pattern, parser.packages)}
+
+    if 'Imports' not in parser.this_file:
+        parser.this_file['Imports'] = {}
+
+    if as_ in parser.this_file['Imports']:
+        raise Exception(f"At least two packages imported as '{as_}' in file '{parser.this_file['Path']}'.")
+
+    parser.this_file['Imports'][as_] = import_
