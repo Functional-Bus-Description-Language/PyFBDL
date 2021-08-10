@@ -1,6 +1,8 @@
 """
 Module for code related with expressions.
 
+All build_* and evaluate_* functions are in alphabetical order.
+
 Some build functions call name.value before returning.
 This is a try to evluate the value during parsing.
 This makes the post parsing expression evaluations shorter.
@@ -40,27 +42,33 @@ class ExprDict(dict):
         left = self['Left'].value
         operator = self['Operator']
         right = self['Right'].value
+
+        if left is None or right is None:
+            return None
+
         if operator == '+':
-            return  left + right
+            return left + right
         elif operator == '-':
-            return  left - right
+            return left - right
         elif operator == '*':
-            return  left * right
+            return left * right
         elif operator == '/':
-            return  left / right
+            return left / right
         elif operator == '%':
-            return  left % right
+            return left % right
         elif operator == '**':
-            return  left ** right
+            return left ** right
         elif operator == '<<':
-            return  left << right
+            return left << right
         elif operator == '>>':
-            return  left >> right
+            return left >> right
 
     def evaluate_identifier(self):
         pkg_symbols = self.parser.this_pkg['Symbols']
         if not self['String'] in pkg_symbols:
-            raise KeyError(f"Can't find symbol '{self['String']}' in package '{self.parser.this_pkg['Path']}'.")
+            raise KeyError(
+                f"Can't find symbol '{self['String']}' in package '{self.parser.this_pkg['Path']}'."
+            )
 
         return pkg_symbols[self['String']]['Value'].value
 
@@ -80,6 +88,13 @@ def build_binary_operation(parser, node):
     return bo
 
 
+def build_binary_literal(parser, node):
+    bl = ExprDict(parser, node)
+    bl.value = int(bl['String'], base=2)
+
+    return bl
+
+
 def build_decimal_literal(parser, node):
     dl = ExprDict(parser, node)
     dl.value = int(dl['String'])
@@ -93,17 +108,34 @@ def build_expression(parser, node):
     child_node = node.children[0]
     e['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node)
 
-    e.value
-
     return e
+
+
+def build_false(parser, node):
+    f = ExprDict(parser, node)
+    f.value = False
+
+    return f
+
+
+def build_hex_literal(parser, node):
+    hl = ExprDict(parser, node)
+    hl.value = int(hl['String'], base=16)
+
+    return hl
 
 
 def build_identifier(parser, node):
     i = ExprDict(parser, node)
 
-    i.value
-
     return i
+
+
+def build_octal_literal(parser, node):
+    ol = ExprDict(parser, node)
+    ol.value = int(ol['String'], base=8)
+
+    return ol
 
 
 def build_primary_expression(parser, node):
@@ -111,8 +143,6 @@ def build_primary_expression(parser, node):
 
     child_node = node.children[0]
     pe['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node)
-
-    pe.value
 
     return pe
 

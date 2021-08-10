@@ -17,7 +17,7 @@ ts_parser.set_language(FBDLANG)
 import expr
 
 
-class Parser():
+class Parser:
     def __init__(self, tree, code, this_file, this_pkg, packages):
         self.tree = tree
         self.cursor = tree.walk()
@@ -45,7 +45,7 @@ class Parser():
 
         if msg:
             raise Exception(
-                f"Found errors in file '{self.file_path}':"
+                f"Found errors in file '{self.this_file['Path']}':"
                 + msg
                 + "\nBe careful, error location returned by the tree-sitter might be misleading."
                 + "\nEspecially if more than one error is reported."
@@ -99,7 +99,7 @@ def parse_file(this_file, this_pkg, packages):
     code = bytes(this_file['Handle'].read(), 'utf8')
 
     tree = ts_parser.parse(code)
-    parser = Parser(tree, code, this_file['Path'], this_pkg, packages)
+    parser = Parser(tree, code, this_file, this_pkg, packages)
     parser.check_for_errors()
 
     if parser.goto_first_child() == False:
