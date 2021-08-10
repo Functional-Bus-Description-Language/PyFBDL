@@ -119,9 +119,13 @@ def add_main_file(main, packages):
     packages
         Package dictionary.
     """
+    path = os.path.join(os.getcwd(), main)
     packages['main'] = []
     packages['main'].append(
-        {'Files': [{'Path': main, 'Handle': open(main, encoding='UTF-8')}]}
+        {
+            'Files': [{'Path': main, 'Handle': open(main, encoding='UTF-8')}],
+            'Path': path,
+        }
     )
 
 
