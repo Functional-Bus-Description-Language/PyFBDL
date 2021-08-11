@@ -10,7 +10,7 @@ import os
 from pprint import pformat
 import sys
 
-import utils
+from packages import Packages
 
 
 def check_path(path, packages):
@@ -21,7 +21,7 @@ def check_path(path, packages):
         file_path = os.path.join(path, f)
         if os.path.isfile(file_path) and f.endswith(".fbd"):
             if not pkg_name:
-                pkg_name = utils.get_pkg_name(os.path.basename(path))
+                pkg_name = Packages.get_pkg_name(os.path.basename(path))
             file_['Path'] = file_path
             file_['Handle'] = open(file_path, encoding='UTF-8')
             files.append(file_)
@@ -60,7 +60,7 @@ def discover_packages():
     else:
         raise Exception("%s platform is not supported, fire an issue." % sys.platform)
 
-    packages = {}
+    packages = Packages()
 
     log.debug(f"Looking for packages in following paths:\n{pformat(paths_to_look)}")
     for path_to_look in paths_to_look:
@@ -110,7 +110,7 @@ def check_indent(file_):
 
 
 def add_main_file(main, packages):
-    """Add main file to the package dictionary.
+    """Add main file to the packages dictionary.
 
     Parameters
     ----------

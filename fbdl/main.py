@@ -5,7 +5,6 @@ import sys
 
 import pre
 import ts
-import utils
 
 VERSION = "0.0.0"
 
@@ -43,12 +42,8 @@ def main():
     )
 
     packages = pre.prepare_packages(cmd_line_args.main)
-
     ts.parse(packages)
-    dependency_graph = utils.build_dependency_graph(packages)
-    utils.check_packages_dependency_graph(dependency_graph)
-    evaluation_order = utils.get_pkgs_in_evaluation_order(dependency_graph, packages)
-    ts.evaluate(packages)
+    packages.evaluate()
 
 
 if __name__ == "__main__":

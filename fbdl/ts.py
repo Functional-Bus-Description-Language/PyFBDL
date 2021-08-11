@@ -15,7 +15,7 @@ ts_parser = Parser()
 ts_parser.set_language(FBDLANG)
 
 import expr
-import utils
+from packages import Packages
 
 
 class Parser:
@@ -164,7 +164,7 @@ def parse_single_constant_definition(parser):
 def parse_single_import_statement(parser):
     if len(parser.node.children) == 2:
         path_pattern = parser.get_node_string(parser.node.children[1])[1:-1]
-        as_ = utils.get_pkg_name(path_pattern)
+        as_ = Packages.get_pkg_name(path_pattern)
     else:
         path_pattern = parser.get_node_string(parser.node.children[2])[1:-1]
         as_ = parser.get_node_string(parser.node.children[1])
@@ -173,7 +173,7 @@ def parse_single_import_statement(parser):
     if actual_name.startswith('fbd-'):
         actual_name = actual_name[4:]
 
-    import_ = {'Actual Name': actual_name, 'Package': utils.get_ref_to_pkg(path_pattern, parser.packages)}
+    import_ = {'Actual Name': actual_name, 'Package': parser.packages.get_ref_to_pkg(path_pattern)}
 
     if 'Imports' not in parser.this_file:
         parser.this_file['Imports'] = {}
@@ -182,7 +182,3 @@ def parse_single_import_statement(parser):
         raise Exception(f"At least two packages imported as '{as_}' in file '{parser.this_file['Path']}'.")
 
     parser.this_file['Imports'][as_] = import_
-
-
-def evaluate(packages):
-    pass
