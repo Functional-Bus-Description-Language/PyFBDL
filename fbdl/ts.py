@@ -4,6 +4,7 @@ Module for code utilizing tree-sitter.
 import sys
 
 this_module = sys.modules[__name__]
+print(__name__)
 
 from tree_sitter import Language, Parser, TreeCursor
 
@@ -14,9 +15,8 @@ FBDLANG = Language('build/fbdl.so', 'fbdl')
 ts_parser = Parser()
 ts_parser.set_language(FBDLANG)
 
-import expr
-from packages import Packages
-
+from . import expr
+from .packages import Packages
 
 class Parser:
     def __init__(self, tree, code, this_file, this_pkg, packages):

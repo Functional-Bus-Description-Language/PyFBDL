@@ -10,7 +10,7 @@ import os
 from pprint import pformat
 import sys
 
-from packages import Packages
+from .packages import Packages
 
 
 def check_path(path, packages):

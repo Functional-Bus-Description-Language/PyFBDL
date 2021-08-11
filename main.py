@@ -3,8 +3,8 @@ import logging as log
 from pprint import pformat
 import sys
 
-import pre
-import ts
+from fbdl import pre
+from fbdl import ts
 
 VERSION = "0.0.0"
 
