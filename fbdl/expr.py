@@ -77,7 +77,7 @@ class ExprDict(dict):
 
     def evaluate_qualified_identifier(self):
         pkg_name = self['Package']
-        exception_msg = f"File '{self.parser.this_file['Path']}' does not import package '{pkg_name}'."
+        exception_msg = f"File '{self.parser.this_file['Path']}' doesn't import package '{pkg_name}'."
         if 'Imports' not in self.parser.this_file:
             raise Exception(exception_msg)
 
@@ -181,5 +181,14 @@ def build_true(parser, node):
 def build_qualified_identifier(parser, node):
     qi = ExprDict(parser, node)
     qi['Package'], qi['Identifier'] = qi['String'].split('.')
+
+    if not qi['Identifier'][0].isupper():
+        raise Exception(
+            f"Symbol '{qi['Identifier']}', imported from package '{qi['Package']}', " +
+            f"starts with lower case letter in file " +
+            f"'{parser.this_file['Path']}', line {node.start_point[0] + 1}.\nMaybe you " +
+            f"meant '{qi['Package'] + '.'+ qi['Identifier'][0].upper() + qi['Identifier'][1:]}'?" +
+            f" or '{qi['Identifier']}' instead of {qi['String']}."
+        )
 
     return qi
