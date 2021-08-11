@@ -1,6 +1,7 @@
 """
 Module for packages dictionary.
 """
+import logging as log
 from pprint import pformat
 import networkx as nx
 
@@ -16,7 +17,6 @@ class Packages(dict):
         if name.startswith('fbd-'):
             name = name[4:]
         return name
-
 
     def get_ref_to_pkg(self, path_pattern):
         """Get reference to the package based on the path pattern."""
@@ -43,10 +43,11 @@ class Packages(dict):
                 found_pkg = pkg
 
         if found_pkg is None:
-            raise Exception(f"Can't match any package for path pattern '{path_pattern}'.")
+            raise Exception(
+                f"Can't match any package for path pattern '{path_pattern}'."
+            )
 
         return found_pkg
-
 
     def _build_dependency_graph(self):
         """Build directed graph for packages dependency."""
@@ -63,8 +64,7 @@ class Packages(dict):
                         if edge not in edges:
                             edges.append(edge)
 
-        self.dependency_graph =  nx.DiGraph(edges)
-
+        self.dependency_graph = nx.DiGraph(edges)
 
     def _check_dependency_graph(self):
         """Check dependency graph for cycles."""
@@ -74,7 +74,6 @@ class Packages(dict):
             raise Exception(
                 f"Found following package dependency cycles:\n{pformat(cycles)}."
             )
-
 
     def _get_pkgs_in_evaluation_order(self):
         paths = list(nx.topological_sort(self.dependency_graph))
@@ -86,3 +85,28 @@ class Packages(dict):
         """Evaluate expressions within packages."""
         self._build_dependency_graph()
         self._check_dependency_graph()
+
+        pkgs = self._get_pkgs_in_evaluation_order()
+
+        for pkg in pkgs:
+            log.info(f"Evaluating package '{pkg['Path']}'")
+            # Number of evaluations tries can be arbitraly changed.
+            # The required number depends on the nesting of symbols in expressions.
+            for i in range(16):
+                log.debug(f"Package evaluation iteration number {i}")
+                all_evaluated = True
+
+                # TODO: Rethink this as not all symbols are constants with 'Value' key.
+                for _, symbol in pkg['Symbols'].items():
+                    if symbol['Value'].value == None:
+                        all_evaluated = False
+
+                if all_evaluated:
+                    log.debug(
+                        f"Package '{pkg['Path']}' evaluated after {i + 1} iterations."
+                    )
+                    break
+            else:
+                raise Exception(
+                    f"Can't evaluate package '{pkg['Path']}'. Try to increase the evaluation tries number."
+                )

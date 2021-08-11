@@ -3,6 +3,7 @@ Module for code related with expressions.
 
 All build_* and evaluate_* functions are in alphabetical order.
 """
+import logging as log
 import sys
 from pprint import pprint
 
@@ -20,14 +21,20 @@ class ExprDict(dict):
 
     @property
     def value(self):
+        # If already evaluated return.
         if self._value:
             return self._value
 
         kind = self['Kind']
+        log.debug(f"Evaluating {kind}: '{self['String']}'")
         if kind in ['expression', 'parenthesized_expression', 'primary_expression']:
             self.value = self['Child'].value
         else:
             self.value = getattr(self, 'evaluate_' + kind)()
+
+        # If evaluated successfully return.
+        if self._value:
+            return self._value
 
     @value.setter
     def value(self, v):
