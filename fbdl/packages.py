@@ -51,19 +51,23 @@ class Packages(dict):
 
     def _build_dependency_graph(self):
         """Build directed graph for packages dependency."""
+        used_packages = [self['main'][0]]
         edges = []
 
-        for pkg_name, pkgs in self.items():
-            for pkg in pkgs:
-                for f in pkg['Files']:
-                    if 'Imports' not in f:
-                        continue
+        for pkg in used_packages:
+            for f in pkg['Files']:
+                if 'Imports' not in f:
+                    continue
 
-                    for _, imported_pkg in f['Imports'].items():
-                        edge = (pkg['Path'], imported_pkg['Package']['Path'])
-                        if edge not in edges:
-                            edges.append(edge)
+                for _, imported_pkg in f['Imports'].items():
+                    edge = (pkg['Path'], imported_pkg['Package']['Path'])
+                    if edge not in edges:
+                        edges.append(edge)
 
+                    if imported_pkg['Package'] not in used_packages:
+                        used_packages.append(imported_pkg['Package'])
+
+        log.debug(f"Package dependency graph edges:\n{pformat(edges)}")
         self.dependency_graph = nx.DiGraph(edges)
 
     def _check_dependency_graph(self):
@@ -78,6 +82,10 @@ class Packages(dict):
     def _get_pkgs_in_evaluation_order(self):
         paths = list(nx.topological_sort(self.dependency_graph))
         paths.reverse()
+
+        # If path is empty, then there is only the main package.
+        if not paths:
+            paths.append(self['main'][0]['Path'])
 
         return [self.get_ref_to_pkg(p) for p in paths]
 

@@ -111,6 +111,8 @@ def parse_file(this_file, this_pkg, packages):
         # Imports have to be handled in different way, as they are not classical symbols.
         if node_type == 'single_import_statement':
             parse_single_import_statement(parser)
+        elif node_type == 'comment':
+            pass
         else:
             for name, symbol in getattr(this_module, 'parse_' + node_type)(parser):
                 if name and name in this_file['Symbols']:
@@ -173,12 +175,17 @@ def parse_single_import_statement(parser):
     if actual_name.startswith('fbd-'):
         actual_name = actual_name[4:]
 
-    import_ = {'Actual Name': actual_name, 'Package': parser.packages.get_ref_to_pkg(path_pattern)}
+    import_ = {
+        'Actual Name': actual_name,
+        'Package': parser.packages.get_ref_to_pkg(path_pattern),
+    }
 
     if 'Imports' not in parser.this_file:
         parser.this_file['Imports'] = {}
 
     if as_ in parser.this_file['Imports']:
-        raise Exception(f"At least two packages imported as '{as_}' in file '{parser.this_file['Path']}'.")
+        raise Exception(
+            f"At least two packages imported as '{as_}' in file '{parser.this_file['Path']}'."
+        )
 
     parser.this_file['Imports'][as_] = import_

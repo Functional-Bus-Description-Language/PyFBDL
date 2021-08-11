@@ -17,10 +17,10 @@ def parse_cmd_line_args():
 
     parser.add_argument('main', help="Path to the main file.")
 
-    parser.add_argument('-l', help="Log debug messages.", action='store_true')
+    parser.add_argument('-d', help="Log debug messages.", action='store_true')
 
     parser.add_argument(
-        '-d',
+        '-p',
         help="Dump packages dictionary to a file.",
         type=argparse.FileType('w'),
         metavar='file_path',
@@ -33,7 +33,7 @@ def main():
     cmd_line_args = parse_cmd_line_args()
 
     log_level = log.INFO
-    if cmd_line_args.l:
+    if cmd_line_args.d:
         log_level = log.DEBUG
     log.basicConfig(
         level=log_level, format="%(levelname)s: %(message)s", stream=sys.stderr
@@ -43,9 +43,9 @@ def main():
     ts.parse(packages)
     packages.evaluate()
 
-    if cmd_line_args.d:
-        cmd_line_args.d.write(pformat(packages))
-        cmd_line_args.d.close()
+    if cmd_line_args.p:
+        cmd_line_args.p.write(pformat(packages))
+        cmd_line_args.p.close()
 
 
 if __name__ == "__main__":

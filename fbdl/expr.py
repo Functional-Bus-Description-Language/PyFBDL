@@ -69,11 +69,25 @@ class ExprDict(dict):
     def evaluate_identifier(self):
         pkg_symbols = self.parser.this_pkg['Symbols']
         if not self['String'] in pkg_symbols:
-            raise KeyError(
+            raise Exception(
                 f"Can't find symbol '{self['String']}' in package '{self.parser.this_pkg['Path']}'."
             )
 
         return pkg_symbols[self['String']]['Value'].value
+
+    def evaluate_qualified_identifier(self):
+        pkg_name = self['Package']
+        exception_msg = f"File '{self.parser.this_file['Path']}' does not import package '{pkg_name}'."
+        if 'Imports' not in self.parser.this_file:
+            raise Exception(exception_msg)
+
+        imported_packages = self.parser.this_file['Imports']
+
+        if pkg_name not in imported_packages:
+            raise Exception(exception_msg)
+        symbols = imported_packages[pkg_name]['Package']['Symbols']
+
+        return symbols[self['Identifier']]['Value'].value
 
 
 def build_binary_operation(parser, node):
@@ -162,3 +176,10 @@ def build_true(parser, node):
     t.value = True
 
     return t
+
+
+def build_qualified_identifier(parser, node):
+    qi = ExprDict(parser, node)
+    qi['Package'], qi['Identifier'] = qi['String'].split('.')
+
+    return qi
