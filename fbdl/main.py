@@ -5,6 +5,7 @@ import sys
 
 import pre
 import ts
+import utils
 
 VERSION = "0.0.0"
 
@@ -20,7 +21,7 @@ def parse_cmd_line_args():
     parser.add_argument(
         '-l',
         help="Log level. The default is 'info'.",
-        choices=['debug', 'info', 'warn', 'error'],
+        choices=['debug', 'info', 'warn'],
         default='info',
     )
 
@@ -34,7 +35,6 @@ def main():
         'debug': log.DEBUG,
         'info': log.INFO,
         'warn': log.WARN,
-        'error': log.ERROR,
     }
     log.basicConfig(
         level=log_levels[cmd_line_args.l],
@@ -45,7 +45,11 @@ def main():
     packages = pre.prepare_packages(cmd_line_args.main)
 
     ts.parse(packages)
-    log.debug(f"Packages after parsing:\n{pformat(packages)}")
+    dependency_graph = utils.build_dependency_graph(packages)
+    utils.check_packages_dependency_graph(dependency_graph)
+    evaluation_order = utils.get_pkgs_in_evaluation_order(dependency_graph, packages)
+    ts.evaluate(packages)
+
 
 if __name__ == "__main__":
     main()

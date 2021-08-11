@@ -77,8 +77,8 @@ def traverse_tree(tree):
 
 
 def parse(packages):
-    for package, list_ in packages.items():
-        for pkg in list_:
+    for pkg_name, pkgs in packages.items():
+        for pkg in pkgs:
             for f in pkg['Files']:
                 parse_file(f, pkg, packages)
 
@@ -164,9 +164,7 @@ def parse_single_constant_definition(parser):
 def parse_single_import_statement(parser):
     if len(parser.node.children) == 2:
         path_pattern = parser.get_node_string(parser.node.children[1])[1:-1]
-        as_ = path_pattern.split('/')[-1]
-        if as_.startswith('fbd-'):
-            as_ = as_[4:]
+        as_ = utils.get_pkg_name(path_pattern)
     else:
         path_pattern = parser.get_node_string(parser.node.children[2])[1:-1]
         as_ = parser.get_node_string(parser.node.children[1])
@@ -175,7 +173,7 @@ def parse_single_import_statement(parser):
     if actual_name.startswith('fbd-'):
         actual_name = actual_name[4:]
 
-    import_ = {'Actual Name': actual_name, 'Package': utils.get_ref_to_package(path_pattern, parser.packages)}
+    import_ = {'Actual Name': actual_name, 'Package': utils.get_ref_to_pkg(path_pattern, parser.packages)}
 
     if 'Imports' not in parser.this_file:
         parser.this_file['Imports'] = {}
@@ -184,3 +182,7 @@ def parse_single_import_statement(parser):
         raise Exception(f"At least two packages imported as '{as_}' in file '{parser.this_file['Path']}'.")
 
     parser.this_file['Imports'][as_] = import_
+
+
+def evaluate(packages):
+    pass

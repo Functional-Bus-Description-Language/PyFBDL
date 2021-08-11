@@ -10,6 +10,8 @@ import os
 from pprint import pformat
 import sys
 
+import utils
+
 
 def check_path(path, packages):
     pkg_name = ""
@@ -19,9 +21,7 @@ def check_path(path, packages):
         file_path = os.path.join(path, f)
         if os.path.isfile(file_path) and f.endswith(".fbd"):
             if not pkg_name:
-                pkg_name = os.path.basename(path)
-                if pkg_name.startswith("fbd-"):
-                    pkg_name = pkg_name[4:]
+                pkg_name = utils.get_pkg_name(os.path.basename(path))
             file_['Path'] = file_path
             file_['Handle'] = open(file_path, encoding='UTF-8')
             files.append(file_)
@@ -146,8 +146,8 @@ def prepare_packages(main):
     add_main_file(main, packages)
     log.debug(f"Found following packages:\n{pformat(packages)}")
 
-    for package, list_ in packages.items():
-        for pkg in list_:
+    for pkg_name, pkgs in packages.items():
+        for pkg in pkgs:
             for f in pkg['Files']:
                 check_indent(f['Handle'])
 

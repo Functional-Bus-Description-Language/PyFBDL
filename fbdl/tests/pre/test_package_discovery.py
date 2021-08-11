@@ -51,14 +51,14 @@ class TestPackageDiscovery(unittest.TestCase):
             ],
         }
 
-        for package, list_ in expected.items():
-            self.assertEqual(package in packages, True)
-            for i, pkg in enumerate(list_):
-                self.assertEqual(pkg['Path'], packages[package][i]['Path'])
+        for pkg_name, pkgs in expected.items():
+            self.assertEqual(pkg_name in packages, True)
+            for i, pkg in enumerate(pkgs):
+                self.assertEqual(pkg['Path'], packages[pkg_name][i]['Path'])
                 for j, f in enumerate(pkg['Files']):
-                    self.assertEqual(f['Path'], packages[package][i]['Files'][j]['Path'])
+                    self.assertEqual(f['Path'], packages[pkg_name][i]['Files'][j]['Path'])
 
-        for package, list_ in packages.items():
-            for pkg in list_:
+        for pkg_name, pkgs in packages.items():
+            for pkg in pkgs:
                 for f in pkg['Files']:
                     f['Handle'].close()
