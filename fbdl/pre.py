@@ -62,7 +62,7 @@ def discover_packages():
 
     packages = Packages()
 
-    log.debug(f"Looking for packages in following paths:\n{pformat(paths_to_look)}")
+    log.info(f"Looking for packages in following paths:\n{pformat(paths_to_look)}")
     for path_to_look in paths_to_look:
         dirs = next(os.walk(path_to_look))[1]
         paths = [os.path.join(path_to_look, d) for d in dirs]
@@ -70,7 +70,7 @@ def discover_packages():
         for p in paths:
             check_path(p, packages)
 
-    log.debug(f"Looking for packages in 'fbd-' directories.")
+    log.info(f"Looking for packages in 'fbd-' directories.")
     for p, _, _ in os.walk(cwd):
         if p.startswith(cwdfbd):
             continue
@@ -140,7 +140,7 @@ def prepare_packages(main):
     -------
         Package dictionary.
     """
-    log.debug("Discovering packages.")
+    log.info("Discovering packages.")
     packages = discover_packages()
 
     add_main_file(main, packages)
