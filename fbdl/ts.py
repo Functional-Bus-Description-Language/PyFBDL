@@ -17,6 +17,7 @@ ts_parser.set_language(FBDLANG)
 from . import expr
 from .packages import Packages
 from .refdict import RefDict
+from .validation import validate_properties
 
 
 class ParserBase:
@@ -25,6 +26,9 @@ class ParserBase:
 
     def get_node_string(self, node):
         return self.code[node.start_byte : node.end_byte].decode('utf8')
+
+    def get_file_line_message(self, node):
+        return f"File '{self.this_file['Path']}', line {node.start_point[0] + 1}."
 
     def check_for_errors(self):
         msg = ""
@@ -152,15 +156,55 @@ def parse_element_anonymous_instantiation(parser):
     return [(None, None)]
 
 
+def parse_element_body(parser):
+    properties = {}
+
+    for node in parser.node.children:
+        if node.type == 'property_assignment':
+            name, value, line_number = parse_propery_assignment(
+                ParserFromNode(parser, node)
+            )
+
+            if name in properties:
+                raise Exception(
+                    f"Property '{name}' assigned at least twice within the same element body. "
+                    + parser.get_file_line_message(node)
+                )
+
+            properties[name] = {'Value': value, 'Line Number': line_number}
+
+    return properties
+
+
 def parse_element_definition(parser):
     name = parser.get_node_string(parser.node.children[1])
     symbol = {
         'Kind': 'Element Definition',
-        'Type': parser.get_node_string(parser.node.children[0])
+        'Type': parser.get_node_string(parser.node.children[0]),
     }
 
-    if parser.node.children[2].type == 'parameter_list':
-        symbol['Parameter List'] = parse_parameter_list(ParserFromNode(parser, parser.node.children[2]))
+    num_of_children = len(parser.node.children)
+
+    if num_of_children > 2 and parser.node.children[2].type == 'parameter_list':
+        symbol['Parameter List'] = parse_parameter_list(
+            ParserFromNode(parser, parser.node.children[2])
+        )
+    if (
+        num_of_children > 2
+        and parser.node.children[num_of_children - 1].type == 'element_body'
+    ):
+        properties = parse_element_body(
+            ParserFromNode(parser, parser.node.children[num_of_children - 1])
+        )
+        symbol['Properties'] = properties
+
+    # Check if properties are valid for given element type.
+    wrong_prop = validate_properties(symbol['Properties'], symbol['Type'])
+    if wrong_prop:
+        raise Exception(
+            f"Property '{wrong_prop}' is not valid property for {symbol['Type']} element. "
+            + f"File '{parser.this_file['Path']}', line {symbol['Properties'][wrong_prop]['Line Number']}."
+        )
 
     return [(name, symbol)]
 
@@ -199,8 +243,8 @@ def parse_parameter_list(parser):
         if parser.node.children[i + 1].type in [',', ')']:
             if name in params:
                 raise Exception(
-                    f"Parameter {name} defined at least twice in parameter list. " +
-                    f"File '{parser.this_file['Path']}', line {node.start_point[0] + 1}."
+                    f"Parameter {name} defined at least twice in parameter list. "
+                    + parser.get_file_line_message(node)
                 )
 
             if name:
@@ -212,14 +256,22 @@ def parse_parameter_list(parser):
     for p in params:
         if with_defalut and p['Default Value'] is None:
             raise Exception(
-                "Parameters without default value must precede the ones with default value. " +
-                f"File '{parser.this_file['Path']}', line {parser.node.start_point[0] + 1}."
+                "Parameters without default value must precede the ones with default value. "
+                + parser.get_file_line_message(node)
             )
 
         if p["Default Value"]:
             with_defalut = True
 
     return tuple(params)
+
+
+def parse_propery_assignment(parser):
+    name = parser.get_node_string(parser.node.children[0])
+    value = expr.build_expression(parser, parser.node.children[2])
+    line_number = parser.node.start_point[0] + 1
+
+    return name, value, line_number
 
 
 def parse_single_constant_definition(parser):
