@@ -106,8 +106,9 @@ class Packages(dict):
 
                 # TODO: Rethink this as not all symbols are constants with 'Value' key.
                 for _, symbol in pkg['Symbols'].items():
-                    if symbol['Value'].value == None:
-                        all_evaluated = False
+                    if symbol['Kind'] == 'Constant':
+                        if symbol['Value'].value == None:
+                            all_evaluated = False
 
                 if all_evaluated:
                     log.debug(

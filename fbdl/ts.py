@@ -4,7 +4,6 @@ Module for code utilizing tree-sitter.
 import sys
 
 this_module = sys.modules[__name__]
-print(__name__)
 
 from tree_sitter import Language, Parser, TreeCursor
 
@@ -19,15 +18,8 @@ from . import expr
 from .packages import Packages
 from .refdict import RefDict
 
-class Parser:
-    def __init__(self, tree, code, this_file, this_pkg, packages):
-        self.tree = tree
-        self.cursor = tree.walk()
-        self.code = code
-        self.this_file = this_file
-        self.this_pkg = this_pkg
-        self.packages = packages
 
+class ParserBase:
     def __getattr__(self, name):
         return self.cursor.__getattribute__(name)
 
@@ -52,6 +44,26 @@ class Parser:
                 + "\nBe careful, error location returned by the tree-sitter might be misleading."
                 + "\nEspecially if more than one error is reported."
             )
+
+
+class Parser(ParserBase):
+    def __init__(self, tree, code, this_file, this_pkg, packages):
+        self.tree = tree
+        self.cursor = tree.walk()
+        self.code = code
+        self.this_file = this_file
+        self.this_pkg = this_pkg
+        self.packages = packages
+
+
+class ParserFromNode(ParserBase):
+    def __init__(self, parser, node):
+        self.tree = parser.tree
+        self.cursor = node.walk()
+        self.code = parser.code
+        self.this_file = parser.this_file
+        self.this_pkg = parser.this_pkg
+        self.packages = parser.packages
 
 
 def traverse_tree(tree):
@@ -136,8 +148,21 @@ def parse_file(this_file, this_pkg, packages):
 
 
 def parse_element_anonymous_instantiation(parser):
-    symbol = {'Kind': 'Element'}
+    symbol = {'Kind': 'Element Anonymous Instantiation'}
     return [(None, None)]
+
+
+def parse_element_definition(parser):
+    name = parser.get_node_string(parser.node.children[1])
+    symbol = {
+        'Kind': 'Element Definition',
+        'Type': parser.get_node_string(parser.node.children[0])
+    }
+
+    if parser.node.children[2].type == 'parameter_list':
+        symbol['Parameter List'] = parse_parameter_list(ParserFromNode(parser, parser.node.children[2]))
+
+    return [(name, symbol)]
 
 
 def parse_multi_constant_definition(parser):
@@ -153,6 +178,48 @@ def parse_multi_constant_definition(parser):
         symbols.append((name, symbol))
 
     return symbols
+
+
+def parse_parameter_list(parser):
+    params = []
+
+    name = None
+    for i, node in enumerate(parser.node.children):
+        if node.type == ')':
+            break
+
+        param = {'Default Value': None}
+
+        if node.type == 'identifier':
+            name = parser.get_node_string(node)
+
+        if node.type == 'expression':
+            param['Default Value'] = expr.build_expression(parser, node)
+
+        if parser.node.children[i + 1].type in [',', ')']:
+            if name in params:
+                raise Exception(
+                    f"Parameter {name} defined at least twice in parameter list. " +
+                    f"File '{parser.this_file['Path']}', line {node.start_point[0] + 1}."
+                )
+
+            if name:
+                param['Name'] = name
+                params.append(param)
+
+    # Check if parameters without default value precede parameters with default value.
+    with_defalut = False
+    for p in params:
+        if with_defalut and p['Default Value'] is None:
+            raise Exception(
+                "Parameters without default value must precede the ones with default value. " +
+                f"File '{parser.this_file['Path']}', line {parser.node.start_point[0] + 1}."
+            )
+
+        if p["Default Value"]:
+            with_defalut = True
+
+    return tuple(params)
 
 
 def parse_single_constant_definition(parser):
