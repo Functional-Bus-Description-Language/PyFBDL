@@ -30,13 +30,14 @@ def check_path(path, packages):
         if pkg_name == "main":
             raise Exception(f"Package can not be named 'main': {path}.")
 
-        dir = {}
-        dir['Path'] = path
-        dir['Files'] = files
+        pkg = {}
+        pkg['Path'] = path
+        pkg['Files'] = files
+        pkg['Id'] = hex(id(pkg))
         if pkg_name in packages:
-            packages[pkg_name].append(dir)
+            packages[pkg_name].append(pkg)
         else:
-            packages[pkg_name] = [dir]
+            packages[pkg_name] = [pkg]
 
 
 def discover_packages():

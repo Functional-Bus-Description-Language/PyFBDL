@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import argparse
 import logging as log
 from pprint import pformat
@@ -44,7 +46,7 @@ def main():
     packages.evaluate()
 
     if cmd_line_args.p:
-        cmd_line_args.p.write(pformat(packages))
+        cmd_line_args.p.write(pformat(packages) + '\n')
         cmd_line_args.p.close()
 
 

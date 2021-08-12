@@ -17,6 +17,7 @@ ts_parser.set_language(FBDLANG)
 
 from . import expr
 from .packages import Packages
+from .refdict import RefDict
 
 class Parser:
     def __init__(self, tree, code, this_file, this_pkg, packages):
@@ -115,6 +116,7 @@ def parse_file(this_file, this_pkg, packages):
             pass
         else:
             for name, symbol in getattr(this_module, 'parse_' + node_type)(parser):
+                symbol['Id'] = hex(id(symbol))
                 if name and name in this_file['Symbols']:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice in file '{this_file['Path']}'."
@@ -124,10 +126,10 @@ def parse_file(this_file, this_pkg, packages):
 
                 if name and name in this_pkg['Symbols']:
                     raise Exception(
-                        f"Symbol '{name}' defined at least twice in file '{this_file['Path']}'."
+                        f"Symbol '{name}' defined at least twice in package '{this_pkg['Path']}'."
                     )
                 elif name:
-                    this_pkg['Symbols'][name] = symbol
+                    this_pkg['Symbols'][name] = RefDict(symbol)
 
         if not parser.goto_next_sibling():
             break
@@ -177,7 +179,7 @@ def parse_single_import_statement(parser):
 
     import_ = {
         'Actual Name': actual_name,
-        'Package': parser.packages.get_ref_to_pkg(path_pattern),
+        'Package': RefDict(parser.packages.get_ref_to_pkg(path_pattern)),
     }
 
     if 'Imports' not in parser.this_file:
