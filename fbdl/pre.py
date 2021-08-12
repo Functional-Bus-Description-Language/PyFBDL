@@ -32,7 +32,7 @@ def check_path(path, packages):
 
         pkg = {}
         pkg['Path'] = path
-        pkg['Files'] = files
+        pkg['Files'] = tuple(files)
         pkg['Id'] = hex(id(pkg))
         if pkg_name in packages:
             packages[pkg_name].append(pkg)
@@ -81,6 +81,9 @@ def discover_packages():
             continue
 
         check_path(p, packages)
+
+    for pkg_name, pkgs in packages.items():
+        packages[pkg_name] = tuple(pkgs)
 
     return packages
 
