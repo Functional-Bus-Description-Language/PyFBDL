@@ -6,6 +6,10 @@ ValidElements = {
         'Valid Elements': ('block', 'config', 'func', 'mask', 'status'),
         'Valid Properties': ('doc'),
     },
+    'bus': {
+        'Valid Elements': ('block', 'config', 'func', 'mask', 'status'),
+        'Valid Properties': ('doc', 'masters', 'width'),
+    },
     'func': {'Valid Elements': ('param'), 'Valid Properties': ('doc')},
     'mask': {
         'Valid Elements': (),
