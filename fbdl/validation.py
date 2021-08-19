@@ -2,6 +2,10 @@
 Module for code validating elements.
 """
 ValidElements = {
+    'block': {
+        'Valid Elements': ('block', 'config', 'func', 'mask', 'status'),
+        'Valid Properties': ('doc'),
+    },
     'func': {'Valid Elements': ('param'), 'Valid Properties': ('doc')},
     'mask': {
         'Valid Elements': (),
@@ -20,6 +24,7 @@ def validate_properties(properties, element_type):
             return p
 
     return None
+
 
 def validate_elements(elements, element_type):
     for e, v in elements.items():
