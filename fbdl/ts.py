@@ -243,6 +243,7 @@ def parse_element_definition(parser):
         'Kind': 'Element Definition',
         'Type': parser.get_node_string(parser.node.children[0]),
         'Line Number': parser.node.start_point[0] + 1,
+        'Parameter List' : None
     }
 
     num_of_children = len(parser.node.children)
@@ -286,6 +287,7 @@ def parse_element_definitive_instantiation(parser):
         'Kind': 'Element Definitive Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
         'Type': None,
+        'Argument List' : None,
     }
 
     if parser.node.children[1].type == '[':
