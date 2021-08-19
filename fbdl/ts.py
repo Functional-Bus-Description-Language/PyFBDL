@@ -152,6 +152,54 @@ def parse_file(this_file, this_pkg, packages):
             break
 
 
+def parse_argument_list(parser):
+    args = []
+
+    names = []
+    name = None
+    for i, node in enumerate(parser.node.children):
+        if node.type == ')':
+            break
+
+        if node.type == 'identifier':
+            name = parser.get_node_string(node)
+
+        if node.type == 'expression':
+            val = expr.build_expression(parser, node)
+        else:
+            val = None
+
+        if parser.node.children[i + 1].type in [',', ')']:
+            if name and name in names:
+                raise Exception(
+                    f"Argument '{name}' assigned at least twice in argument list. "
+                    + parser.get_file_line_message(node)
+                )
+
+            if val:
+                arg = {'Value': val}
+                if name:
+                    names.append(name)
+                    arg['Name'] = name
+                    name = None
+
+                args.append(arg)
+
+    # Check if arguments without name precede arguments with name.
+    with_name = False
+    for a in args:
+        if with_name and 'Name' not in a:
+            raise Exception(
+                "Arguments without name must precede the ones with name. "
+                + parser.get_file_line_message(node)
+            )
+
+        if 'Name' in a:
+            with_name = True
+
+    return tuple(args)
+
+
 def parse_element_anonymous_instantiation(parser):
     symbol = {'Kind': 'Element Anonymous Instantiation'}
     return [(None, None)]
@@ -232,6 +280,30 @@ def parse_element_definition(parser):
     return [(name, symbol)]
 
 
+def parse_element_definitive_instantiation(parser):
+    name = parser.get_node_string(parser.node.children[0])
+    symbol = {
+        'Kind': 'Element Definitive Instantiation',
+        'Line Number': parser.node.start_point[0] + 1,
+        'Type': None,
+    }
+
+    if parser.node.children[1].type == '[':
+        symbol['Number'] = expr.build_expression(parser, parser.node.children[2])
+
+    if parser.node.children[1].type == 'identifier':
+        symbol['Type'] = parser.get_node_string(parser.node.children[1])
+    else:
+        symbol['Type'] = parser.get_node_string(parser.node.children[4])
+
+    if parser.node.children[-1].type == 'argument_list':
+        symbol['Argument List'] = parse_argument_list(
+            ParserFromNode(parser, parser.node.children[-1])
+        )
+
+    return [(name, symbol)]
+
+
 def parse_multi_constant_definition(parser):
     symbols = []
 
@@ -239,6 +311,7 @@ def parse_multi_constant_definition(parser):
         symbol = {'Kind': 'Constant'}
         name = parser.get_node_string(parser.node.children[i * 3 + 1])
 
+        # TODO: Check if below works as expected.
         expression = {'String': parser.get_node_string(parser.node.children[i * 3 + 3])}
         symbol['Value'] = expression
 
@@ -266,7 +339,7 @@ def parse_parameter_list(parser):
         if parser.node.children[i + 1].type in [',', ')']:
             if name in params:
                 raise Exception(
-                    f"Parameter {name} defined at least twice in parameter list. "
+                    f"Parameter '{name}' defined at least twice in parameter list. "
                     + parser.get_file_line_message(node)
                 )
 
@@ -275,16 +348,16 @@ def parse_parameter_list(parser):
                 params.append(param)
 
     # Check if parameters without default value precede parameters with default value.
-    with_defalut = False
+    with_default = False
     for p in params:
-        if with_defalut and p['Default Value'] is None:
+        if with_default and p['Default Value'] is None:
             raise Exception(
                 "Parameters without default value must precede the ones with default value. "
                 + parser.get_file_line_message(node)
             )
 
-        if p["Default Value"]:
-            with_defalut = True
+        if p['Default Value']:
+            with_default = True
 
     return tuple(params)
 
