@@ -1,6 +1,7 @@
 """
 Module for code utilizing tree-sitter.
 """
+from pprint import pformat
 import sys
 
 this_module = sys.modules[__name__]
@@ -17,7 +18,7 @@ ts_parser.set_language(FBDLANG)
 from . import expr
 from .packages import Packages
 from .refdict import RefDict
-from .validation import validate_properties
+from .validation import *
 
 
 class ParserBase:
@@ -158,6 +159,7 @@ def parse_element_anonymous_instantiation(parser):
 
 def parse_element_body(parser):
     properties = {}
+    symbols = {}
 
     for node in parser.node.children:
         if node.type == 'property_assignment':
@@ -172,8 +174,19 @@ def parse_element_body(parser):
                 )
 
             properties[name] = {'Value': value, 'Line Number': line_number}
+        elif node.type == 'element_definition':
+            for name, symbol in parse_element_definition(ParserFromNode(parser, node)):
+                # TODO: Check if it is needed in the future.
+                # symbol['Id'] = hex(id(symbol))
+                if name and name in symbols:
+                    raise Exception(
+                        f"Symbol '{name}' defined at least twice within the same element body. "
+                        + f"File '{parser.this_file['Path']}', line {node.start_point[0] + 1}."
+                    )
+                elif name:
+                    symbols[name] = symbol
 
-    return properties
+    return properties, symbols
 
 
 def parse_element_definition(parser):
@@ -181,6 +194,7 @@ def parse_element_definition(parser):
     symbol = {
         'Kind': 'Element Definition',
         'Type': parser.get_node_string(parser.node.children[0]),
+        'Line Number': parser.node.start_point[0] + 1,
     }
 
     num_of_children = len(parser.node.children)
@@ -189,14 +203,12 @@ def parse_element_definition(parser):
         symbol['Parameter List'] = parse_parameter_list(
             ParserFromNode(parser, parser.node.children[2])
         )
-    if (
-        num_of_children > 2
-        and parser.node.children[-1].type == 'element_body'
-    ):
-        properties = parse_element_body(
+    if num_of_children > 2 and parser.node.children[-1].type == 'element_body':
+        properties, symbols = parse_element_body(
             ParserFromNode(parser, parser.node.children[-1])
         )
         symbol['Properties'] = properties
+        symbol['Symbols'] = symbols
 
     # Check if properties are valid for given element type.
     wrong_prop = validate_properties(symbol['Properties'], symbol['Type'])
@@ -204,6 +216,17 @@ def parse_element_definition(parser):
         raise Exception(
             f"Property '{wrong_prop}' is not valid property for {symbol['Type']} element. "
             + f"File '{parser.this_file['Path']}', line {symbol['Properties'][wrong_prop]['Line Number']}."
+        )
+
+    # Check if inner elements are valid for given outter element type.
+    wrong_elem_name, wrong_elem_type = validate_elements(
+        symbol['Symbols'], symbol['Type']
+    )
+    if wrong_elem_name:
+        raise Exception(
+            f"Element type '{wrong_elem_type}' is not valid inner element type for '{symbol['Type']}' element type. "
+            + f"File '{parser.this_file['Path']}', line {symbol['Symbols'][wrong_elem_name]['Line Number']}. "
+            + f"Valid inner element types for '{symbol['Type']}' are: {pformat(ValidElements[symbol['Type']]['Valid Elements'])}."
         )
 
     return [(name, symbol)]

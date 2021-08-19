@@ -20,3 +20,10 @@ def validate_properties(properties, element_type):
             return p
 
     return None
+
+def validate_elements(elements, element_type):
+    for e, v in elements.items():
+        if v['Type'] not in ValidElements[element_type]['Valid Elements']:
+            return e, v['Type']
+
+    return None, None
