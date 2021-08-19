@@ -94,9 +94,7 @@ def get_indent(line):
         if char == '\t':
             indent += 1
         elif char == ' ':
-            raise Exception(
-                "Space character ' ' is not allowed in indent. Use tab character '\t'."
-            )
+            return None
         else:
             break
     return indent
@@ -106,6 +104,12 @@ def check_indent(file_):
     current_indent = 0
     for i, line in enumerate(file_):
         indent = get_indent(line)
+        if indent is None:
+            raise Exception(
+                "Space character ' ' is not allowed in indent. Use tab character '\\t'. " +
+                f"File '{file_.name}', line number {i + 1}."
+            )
+
         if indent > current_indent + 1:
             raise Exception(
                 f"Multi indent detected. File '{file_.name}', line number {i + 1}."
