@@ -191,10 +191,10 @@ def parse_element_definition(parser):
         )
     if (
         num_of_children > 2
-        and parser.node.children[num_of_children - 1].type == 'element_body'
+        and parser.node.children[-1].type == 'element_body'
     ):
         properties = parse_element_body(
-            ParserFromNode(parser, parser.node.children[num_of_children - 1])
+            ParserFromNode(parser, parser.node.children[-1])
         )
         symbol['Properties'] = properties
 
