@@ -5,6 +5,9 @@ import logging as log
 from pprint import pformat
 import networkx as nx
 
+from .expr import ExprDict
+from .refdict import RefDict
+
 
 class Packages(dict):
     def __init__(self):
@@ -89,6 +92,23 @@ class Packages(dict):
 
         return [self.get_ref_to_pkg(p) for p in paths]
 
+    def _get_expressions(self, node):
+        expressions = []
+
+        type_ = type(node)
+
+        if type == list or type_ == tuple:
+            for e in node:
+                expressions += self._get_expressions(e)
+        elif type_ == RefDict or type_ == dict:
+            for _, v in node.items():
+                expressions += self._get_expressions(v)
+        elif type_ == ExprDict:
+            expressions.append(node)
+
+        return expressions
+
+
     def evaluate(self):
         """Evaluate expressions within packages."""
         self._build_dependency_graph()
@@ -98,17 +118,21 @@ class Packages(dict):
 
         for pkg in pkgs:
             log.info(f"Evaluating package '{pkg['Path']}'")
+
+            # Collect expressions to evaluate.
+            expressions = []
+            for _, symbol in pkg['Symbols'].items():
+                expressions += self._get_expressions(symbol)
+
             # Number of evaluations tries can be arbitraly changed.
-            # The required number depends on the nesting of symbols in expressions.
+            # The required number depends on the order and nesting of the symbols in expressions.
             for i in range(16):
                 log.debug(f"Package evaluation iteration number {i}")
                 all_evaluated = True
 
-                # TODO: Rethink this as not all symbols are constants with 'Value' key.
-                for _, symbol in pkg['Symbols'].items():
-                    if symbol['Kind'] == 'Constant':
-                        if symbol['Value'].value == None:
-                            all_evaluated = False
+                for e in expressions:
+                    if e.value == None:
+                        all_evaluated = False
 
                 if all_evaluated:
                     log.debug(

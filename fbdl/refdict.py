@@ -13,3 +13,9 @@ class RefDict(dict):
 
     def __setitem__(self, key):
         raise Exception("Trying to set key via RefDict.")
+
+    def get(self, key):
+        return self.d.get(key)
+
+    def items(self):
+        return self.d.items()
