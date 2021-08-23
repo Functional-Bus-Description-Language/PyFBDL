@@ -243,7 +243,6 @@ def parse_element_definition(parser):
         'Kind': 'Element Definition',
         'Type': parser.get_node_string(parser.node.children[0]),
         'Line Number': parser.node.start_point[0] + 1,
-        'Parameter List' : None
     }
 
     num_of_children = len(parser.node.children)
@@ -256,11 +255,15 @@ def parse_element_definition(parser):
         properties, symbols = parse_element_body(
             ParserFromNode(parser, parser.node.children[-1])
         )
-        symbol['Properties'] = properties
-        symbol['Symbols'] = symbols
+        if properties:
+            symbol['Properties'] = properties
+        if symbols:
+            symbol['Symbols'] = symbols
 
     # Check if properties are valid for given element type.
-    wrong_prop = validate_properties(symbol['Properties'], symbol['Type'])
+    wrong_prop = None
+    if symbol.get('Properties'):
+        wrong_prop = validate_properties(symbol['Properties'], symbol['Type'])
     if wrong_prop:
         raise Exception(
             f"Property '{wrong_prop}' is not valid property for {symbol['Type']} element. "
@@ -268,9 +271,11 @@ def parse_element_definition(parser):
         )
 
     # Check if inner elements are valid for given outter element type.
-    wrong_elem_name, wrong_elem_type = validate_elements(
-        symbol['Symbols'], symbol['Type']
-    )
+    wrong_elem_name = None
+    if symbol.get('Symbols'):
+        wrong_elem_name, wrong_elem_type = validate_elements(
+            symbol['Symbols'], symbol['Type']
+        )
     if wrong_elem_name:
         raise Exception(
             f"Element type '{wrong_elem_type}' is not valid inner element type for '{symbol['Type']}' element type. "
@@ -287,7 +292,6 @@ def parse_element_definitive_instantiation(parser):
         'Kind': 'Element Definitive Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
         'Type': None,
-        'Argument List' : None,
     }
 
     if parser.node.children[1].type == '[':
@@ -330,13 +334,13 @@ def parse_parameter_list(parser):
         if node.type == ')':
             break
 
-        param = {'Default Value': None}
+        default_value = None
 
         if node.type == 'identifier':
             name = parser.get_node_string(node)
 
         if node.type == 'expression':
-            param['Default Value'] = expr.build_expression(parser, node)
+            default_value = expr.build_expression(parser, node)
 
         if parser.node.children[i + 1].type in [',', ')']:
             if name in params:
@@ -346,19 +350,21 @@ def parse_parameter_list(parser):
                 )
 
             if name:
-                param['Name'] = name
+                param = {'Name' : name}
+                if default_value:
+                    param['Default Value'] = default_value
                 params.append(param)
 
     # Check if parameters without default value precede parameters with default value.
     with_default = False
     for p in params:
-        if with_default and p['Default Value'] is None:
+        if with_default and p.get('Default Value'):
             raise Exception(
                 "Parameters without default value must precede the ones with default value. "
                 + parser.get_file_line_message(node)
             )
 
-        if p['Default Value']:
+        if p.get('Default Value'):
             with_default = True
 
     return tuple(params)
