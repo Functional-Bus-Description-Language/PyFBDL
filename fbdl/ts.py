@@ -94,6 +94,31 @@ def traverse_tree(tree):
                 retracing = False
 
 
+def validate_properties_and_elements(parser, symbol):
+    # Check if properties are valid for given element type.
+    wrong_prop = None
+    if symbol.get('Properties'):
+        wrong_prop = validate_properties(symbol['Properties'], symbol['Type'])
+    if wrong_prop:
+        raise Exception(
+            f"Property '{wrong_prop}' is not valid property for {symbol['Type']} element. "
+            + f"File '{parser.this_file['Path']}', line {symbol['Properties'][wrong_prop]['Line Number']}."
+        )
+
+    # Check if inner elements are valid for given outter element type.
+    wrong_elem_name = None
+    if symbol.get('Symbols'):
+        wrong_elem_name, wrong_elem_type = validate_elements(
+            symbol['Symbols'], symbol['Type']
+        )
+    if wrong_elem_name:
+        raise Exception(
+            f"Element type '{wrong_elem_type}' is not valid inner element type for '{symbol['Type']}' element type. "
+            + f"File '{parser.this_file['Path']}', line {symbol['Symbols'][wrong_elem_name]['Line Number']}. "
+            + f"Valid inner element types for '{symbol['Type']}' are: {pformat(ValidElements[symbol['Type']]['Valid Elements'])}."
+        )
+
+
 def parse(packages):
     for pkg_name, pkgs in packages.items():
         for pkg in pkgs:
@@ -201,8 +226,32 @@ def parse_argument_list(parser):
 
 
 def parse_element_anonymous_instantiation(parser):
-    symbol = {'Kind': 'Element Anonymous Instantiation'}
-    return [(None, None)]
+    name = parser.get_node_string(parser.node.children[0])
+    symbol = {
+        'Kind': 'Element Anonymous Instantiation',
+        'Line Number': parser.node.start_point[0] + 1,
+    }
+
+    if parser.node.children[1].type == '[':
+        symbol['Number'] = expr.build_expression(parser, parser.node.children[2])
+
+    if parser.node.children[1].type == 'element_type':
+        symbol['Type'] = parser.get_node_string(parser.node.children[1])
+    else:
+        symbol['Type'] = parser.get_node_string(parser.node.children[4])
+
+    if parser.node.children[-1].type == 'element_body':
+        properties, symbols = parse_element_body(
+            ParserFromNode(parser, parser.node.children[-1])
+        )
+        if properties:
+            symbol['Properties'] = properties
+        if symbols:
+            symbol['Symbols'] = symbols
+
+    validate_properties_and_elements(parser, symbol)
+
+    return [(name, symbol)]
 
 
 def parse_element_body(parser):
@@ -260,28 +309,7 @@ def parse_element_definition(parser):
         if symbols:
             symbol['Symbols'] = symbols
 
-    # Check if properties are valid for given element type.
-    wrong_prop = None
-    if symbol.get('Properties'):
-        wrong_prop = validate_properties(symbol['Properties'], symbol['Type'])
-    if wrong_prop:
-        raise Exception(
-            f"Property '{wrong_prop}' is not valid property for {symbol['Type']} element. "
-            + f"File '{parser.this_file['Path']}', line {symbol['Properties'][wrong_prop]['Line Number']}."
-        )
-
-    # Check if inner elements are valid for given outter element type.
-    wrong_elem_name = None
-    if symbol.get('Symbols'):
-        wrong_elem_name, wrong_elem_type = validate_elements(
-            symbol['Symbols'], symbol['Type']
-        )
-    if wrong_elem_name:
-        raise Exception(
-            f"Element type '{wrong_elem_type}' is not valid inner element type for '{symbol['Type']}' element type. "
-            + f"File '{parser.this_file['Path']}', line {symbol['Symbols'][wrong_elem_name]['Line Number']}. "
-            + f"Valid inner element types for '{symbol['Type']}' are: {pformat(ValidElements[symbol['Type']]['Valid Elements'])}."
-        )
+    validate_properties_and_elements(parser, symbol)
 
     return [(name, symbol)]
 
@@ -291,7 +319,6 @@ def parse_element_definitive_instantiation(parser):
     symbol = {
         'Kind': 'Element Definitive Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
-        'Type': None,
     }
 
     if parser.node.children[1].type == '[':
