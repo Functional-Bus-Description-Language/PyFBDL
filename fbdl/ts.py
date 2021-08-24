@@ -272,7 +272,11 @@ def parse_element_body(parser):
                 )
 
             properties[name] = {'Value': value, 'Line Number': line_number}
-        elif node.type in ['element_definition', 'single_constant_definition']:
+        elif node.type in [
+            'element_definition',
+            'single_constant_definition',
+            'multi_constant_definition',
+        ]:
             for name, symbol in getattr(this_module, 'parse_' + node.type)(
                 ParserFromNode(parser, node)
             ):
@@ -346,8 +350,7 @@ def parse_multi_constant_definition(parser):
         symbol = {'Kind': 'Constant'}
         name = parser.get_node_string(parser.node.children[i * 3 + 1])
 
-        # TODO: Check if below works as expected.
-        expression = {'String': parser.get_node_string(parser.node.children[i * 3 + 3])}
+        expression = expr.build_expression(parser, parser.node.children[i * 3 + 3])
         symbol['Value'] = expression
 
         symbols.append((name, symbol))
