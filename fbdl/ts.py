@@ -108,9 +108,17 @@ def validate_properties_and_elements(parser, symbol):
     # Check if inner elements are valid for given outter element type.
     wrong_elem_name = None
     if symbol.get('Symbols'):
-        wrong_elem_name, wrong_elem_type = validate_elements(
-            symbol['Symbols'], symbol['Type']
-        )
+        elements = {
+            k: v
+            for k, v in symbol['Symbols'].items()
+            if v['Kind']
+            in [
+                'Element Definition',
+                'Element Anonymous Instantiation',
+                'Element Definitive Instantiation',
+            ]
+        }
+        wrong_elem_name, wrong_elem_type = validate_elements(elements, symbol['Type'])
     if wrong_elem_name:
         raise Exception(
             f"Element type '{wrong_elem_type}' is not valid inner element type for '{symbol['Type']}' element type. "
@@ -127,13 +135,6 @@ def parse(packages):
 
 
 def parse_file(this_file, this_pkg, packages):
-    """
-    Parameters:
-    this_file
-    this_pkg
-    packages
-    -----------
-    """
     if 'Symbols' not in this_pkg:
         this_pkg['Symbols'] = {}
 
@@ -271,10 +272,11 @@ def parse_element_body(parser):
                 )
 
             properties[name] = {'Value': value, 'Line Number': line_number}
-        elif node.type == 'element_definition':
-            for name, symbol in parse_element_definition(ParserFromNode(parser, node)):
-                # TODO: Check if it is needed in the future.
-                # symbol['Id'] = hex(id(symbol))
+        elif node.type in ['element_definition', 'single_constant_definition']:
+            for name, symbol in getattr(this_module, 'parse_' + node.type)(
+                ParserFromNode(parser, node)
+            ):
+                symbol['Id'] = hex(id(symbol))
                 if name and name in symbols:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice within the same element body. "
@@ -377,7 +379,7 @@ def parse_parameter_list(parser):
                 )
 
             if name:
-                param = {'Name' : name}
+                param = {'Name': name}
                 if default_value:
                     param['Default Value'] = default_value
                 params.append(param)
