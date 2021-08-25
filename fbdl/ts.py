@@ -16,6 +16,7 @@ ts_parser = Parser()
 ts_parser.set_language(FBDLANG)
 
 from . import expr
+from . import idgen
 from .packages import Packages
 from .refdict import RefDict
 from .validation import *
@@ -160,7 +161,7 @@ def parse_file(this_file, this_pkg, packages):
             pass
         else:
             for name, symbol in getattr(this_module, 'parse_' + node_type)(parser):
-                symbol['Id'] = hex(id(symbol))
+                symbol['Id'] = hex(idgen.generate())
                 if name in this_file['Symbols']:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice in file '{this_file['Path']}'."
@@ -282,7 +283,7 @@ def parse_element_body(parser):
             for name, symbol in getattr(this_module, 'parse_' + node.type)(
                 ParserFromNode(parser, node)
             ):
-                symbol['Id'] = hex(id(symbol))
+                symbol['Id'] = hex(idgen.generate())
                 if name and name in symbols:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice within the same element body. "

@@ -43,7 +43,7 @@ def main():
 
     packages = pre.prepare_packages(cmd_line_args.main)
     ts.parse(packages)
-    packages.instantiate()
+    packages.check()
 
     if cmd_line_args.p:
         cmd_line_args.p.write(pformat(packages) + '\n')

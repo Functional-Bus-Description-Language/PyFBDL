@@ -184,11 +184,11 @@ def build_qualified_identifier(parser, node):
 
     if not qi['Identifier'][0].isupper():
         raise Exception(
-            f"Symbol '{qi['Identifier']}', imported from package '{qi['Package']}', " +
-            f"starts with lower case letter in file " +
-            f"'{parser.this_file['Path']}', line {node.start_point[0] + 1}.\nMaybe you " +
-            f"meant '{qi['Package'] + '.'+ qi['Identifier'][0].upper() + qi['Identifier'][1:]}'?" +
-            f" or '{qi['Identifier']}' instead of {qi['String']}."
+            f"Symbol '{qi['Identifier']}', imported from package '{qi['Package']}', "
+            + f"starts with lower case letter in file "
+            + f"'{parser.this_file['Path']}', line {node.start_point[0] + 1}.\nMaybe you "
+            + f"meant '{qi['Package'] + '.'+ qi['Identifier'][0].upper() + qi['Identifier'][1:]}'?"
+            + f" or '{qi['Identifier']}' instead of {qi['String']}."
         )
 
     return qi

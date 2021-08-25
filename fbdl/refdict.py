@@ -2,11 +2,12 @@ class RefDict(dict):
     def __init__(self, d):
         super().__init__()
         self.d = d
+        self.id = self.d['Id']
 
     # TODO: Report the problem with __repr__ as issue somewhere.
     def __repr__(self):
-        return f"RD to '{hex(id(self.d))}'"
-#        return f"{{'RefDict to' : {hex(id(self.d))}}}"
+        return f"RD to '{self.id}'"
+        # return f"{{'RefDict to' : {self.id}}}"
 
     def __getitem__(self, key):
         return self.d[key]

@@ -11,6 +11,7 @@ from pprint import pformat
 import sys
 
 from .packages import Packages
+from . import idgen
 
 
 def check_path(path, packages):
@@ -24,6 +25,7 @@ def check_path(path, packages):
         if os.path.isfile(file_path) and f.endswith(".fbd"):
             if not pkg_name:
                 pkg_name = Packages.get_pkg_name(os.path.basename(path))
+            file_['Id'] = hex(idgen.generate())
             file_['Kind'] = 'File'
             file_['Path'] = file_path
             file_['Handle'] = open(file_path, encoding='UTF-8')
@@ -36,7 +38,7 @@ def check_path(path, packages):
         pkg = {}
         pkg['Path'] = path
         pkg['Files'] = tuple(files)
-        pkg['Id'] = hex(id(pkg))
+        pkg['Id'] = hex(idgen.generate())
         pkg['Kind'] = 'Package'
         if pkg_name in packages:
             packages[pkg_name].append(pkg)
@@ -136,13 +138,18 @@ def add_main_file(main, packages):
     packages['main'].append(
         {
             'Files': [
-                {'Kind': 'File', 'Path': main, 'Handle': open(main, encoding='UTF-8')}
+                {
+                    'Id': hex(idgen.generate()),
+                    'Kind': 'File',
+                    'Path': main,
+                    'Handle': open(main, encoding='UTF-8'),
+                }
             ],
             'Path': path,
             'Kind': 'Package',
         }
     )
-    packages['main'][0]['Id'] = hex(id(packages['main'][0]))
+    packages['main'][0]['Id'] = hex(idgen.generate())
 
 
 def prepare_packages(main):
