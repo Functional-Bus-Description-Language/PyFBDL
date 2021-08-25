@@ -1,4 +1,4 @@
-[![tests](https://github.com/Functional-Bus-Description-Language/PyFBDL/workflows/tests/badge.svg)](https://github.com/Functional-Bus-Description-Language/PyFBDL/actions?query=workflow%3Atests+branch%3Amaster)
+![example workflow](https://github.com/Functional-Bus-Description-Language/PyFBDL/workflows/tests.yml/badge.svg)
 
 # PyFBDL
 
