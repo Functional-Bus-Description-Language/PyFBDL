@@ -1,0 +1,3 @@
+mask my_mask(FOO, BAR=2)
+	atomic = FOO
+	width = BAR
