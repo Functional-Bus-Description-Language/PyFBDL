@@ -27,6 +27,7 @@ jobs:
       - run: python -m unittest
 
   parsing_test:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version:
