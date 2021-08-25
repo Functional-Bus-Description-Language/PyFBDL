@@ -27,7 +27,7 @@ jobs:
       - run: python -m unittest
 
   parsing_test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Checkout repository and submodules
         uses: actions/checkout@v2
