@@ -1,4 +1,4 @@
-name: build
+name: test
 
 on:
   push:
@@ -9,6 +9,21 @@ on:
 jobs:
   unittest:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 3.5
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
     steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
       - run: echo "hello"
       - run: python -m unittest
