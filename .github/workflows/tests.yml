@@ -39,8 +39,7 @@ jobs:
         with:
           python-version: 3.7
 
-      - name: Echo PWD
-        run: echo $PWD
+      - run: which cc
 
       - run: python -m pip install tree-sitter
       - run: python -m pip install networkx
