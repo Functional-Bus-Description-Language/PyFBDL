@@ -8,7 +8,7 @@ ValidElements = {
     },
     'bus': {
         'Valid Elements': ('block', 'config', 'func', 'mask', 'status'),
-        'Valid Properties': ('doc', 'masters', 'width'),
+        'Valid Properties': ('doc', 'masters'),
     },
     'func': {'Valid Elements': ('param'), 'Valid Properties': ('doc')},
     'mask': {

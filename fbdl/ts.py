@@ -274,6 +274,8 @@ def parse_element_body(parser):
             properties[name] = {'Value': value, 'Line Number': line_number}
         elif node.type in [
             'element_definition',
+            'element_anonymous_instantiation',
+            'element_definitive_instantiation',
             'single_constant_definition',
             'multi_constant_definition',
         ]:
