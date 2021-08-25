@@ -2,3 +2,5 @@ dist/
 fbdl.egg-info/
 __pycache__/
 build/
+bus.fbd
+packages.txt
