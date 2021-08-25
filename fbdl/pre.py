@@ -22,6 +22,7 @@ def check_path(path, packages):
         if os.path.isfile(file_path) and f.endswith(".fbd"):
             if not pkg_name:
                 pkg_name = Packages.get_pkg_name(os.path.basename(path))
+            file_['Kind'] = 'File'
             file_['Path'] = file_path
             file_['Handle'] = open(file_path, encoding='UTF-8')
             files.append(file_)
@@ -34,6 +35,7 @@ def check_path(path, packages):
         pkg['Path'] = path
         pkg['Files'] = tuple(files)
         pkg['Id'] = hex(id(pkg))
+        pkg['Kind'] = 'Package'
         if pkg_name in packages:
             packages[pkg_name].append(pkg)
         else:
@@ -106,8 +108,8 @@ def check_indent(file_):
         indent = get_indent(line)
         if indent is None:
             raise Exception(
-                "Space character ' ' is not allowed in indent. Use tab character '\\t'. " +
-                f"File '{file_.name}', line number {i + 1}."
+                "Space character ' ' is not allowed in indent. Use tab character '\\t'. "
+                + f"File '{file_.name}', line number {i + 1}."
             )
 
         if indent > current_indent + 1:
@@ -131,10 +133,14 @@ def add_main_file(main, packages):
     packages['main'] = []
     packages['main'].append(
         {
-            'Files': [{'Path': main, 'Handle': open(main, encoding='UTF-8')}],
+            'Files': [
+                {'Kind': 'File', 'Path': main, 'Handle': open(main, encoding='UTF-8')}
+            ],
             'Path': path,
+            'Kind': 'Package',
         }
     )
+    packages['main'][0]['Id'] = hex(id(packages['main'][0]))
 
 
 def prepare_packages(main):
