@@ -29,7 +29,10 @@ jobs:
   parsing_test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
       - name: Set up Python 3.7
         uses: actions/setup-python@v2

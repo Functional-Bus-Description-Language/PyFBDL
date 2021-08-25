@@ -15,7 +15,7 @@ do
 	echo "Running test $dir"
 	echo "********************************************************************************"
 	cd $dir
-	python ../../../main.py -d -p packages.tmp bus.fbd
+	python3 ../../../main.py -d -p packages.tmp bus.fbd
 	sed '/Path/d' packages.tmp > packages.tmp.sed
 	sed '/Path/d' packages.golden > packages.golden.sed
 	cmp packages.golden.sed packages.tmp.sed
