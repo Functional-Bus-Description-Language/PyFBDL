@@ -45,7 +45,7 @@ class TestPackageDiscovery(unittest.TestCase):
                 {
                     'Files': [
                         {'Path' : path_prefix + "fbdl/tests/pre/dummy_project/fbd/foo/a.fbd"},
-                        {'Path' : path_prefix + "fbdl/tests/pre/dummy_project/fbd/foo/z.fbd"},
+                        {'Path' : path_prefix + "fbdl/tests/pre/dummy_project/fbd/foo/b.fbd"},
                     ],
                     'Path': path_prefix + "fbdl/tests/pre/dummy_project/fbd/foo",
                 }
