@@ -16,7 +16,9 @@ from .packages import Packages
 def check_path(path, packages):
     pkg_name = ""
     files = []
-    for f in os.listdir(path):
+    ls_files = os.listdir(path)
+    ls_files.sort()
+    for f in ls_files:
         file_ = {}
         file_path = os.path.join(path, f)
         if os.path.isfile(file_path) and f.endswith(".fbd"):
