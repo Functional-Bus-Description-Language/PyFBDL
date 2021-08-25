@@ -185,16 +185,13 @@ def parse_argument_list(parser):
     names = []
     name = None
     for i, node in enumerate(parser.node.children):
-        if node.type == ')':
-            break
+        if node.type in ['(', ',', '=', ')']:
+            continue
 
         if node.type == 'identifier':
             name = parser.get_node_string(node)
-
-        if node.type == 'expression':
-            val = expr.build_expression(parser, node)
         else:
-            val = None
+            val = expr.build_expression(parser, node)
 
         if parser.node.children[i + 1].type in [',', ')']:
             if name and name in names:
@@ -203,14 +200,13 @@ def parse_argument_list(parser):
                     + parser.get_file_line_message(node)
                 )
 
-            if val:
-                arg = {'Value': val}
-                if name:
-                    names.append(name)
-                    arg['Name'] = name
-                    name = None
+            arg = {'Value': val}
+            if name:
+                names.append(name)
+                arg['Name'] = name
+                name = None
 
-                args.append(arg)
+            args.append(arg)
 
     # Check if arguments without name precede arguments with name.
     with_name = False
@@ -366,15 +362,14 @@ def parse_parameter_list(parser):
 
     name = None
     for i, node in enumerate(parser.node.children):
-        if node.type == ')':
-            break
+        if node.type in ['(', '=', ',', ')']:
+            continue
 
         default_value = None
 
         if node.type == 'identifier':
             name = parser.get_node_string(node)
-
-        if node.type == 'expression':
+        else:
             default_value = expr.build_expression(parser, node)
 
         if parser.node.children[i + 1].type in [',', ')']:
@@ -384,16 +379,15 @@ def parse_parameter_list(parser):
                     + parser.get_file_line_message(node)
                 )
 
-            if name:
-                param = {'Name': name}
-                if default_value:
-                    param['Default Value'] = default_value
-                params.append(param)
+            param = {'Name': name}
+            if default_value:
+                param['Default Value'] = default_value
+            params.append(param)
 
     # Check if parameters without default value precede parameters with default value.
     with_default = False
     for p in params:
-        if with_default and p.get('Default Value'):
+        if with_default and p.get('Default Value') is None:
             raise Exception(
                 "Parameters without default value must precede the ones with default value. "
                 + parser.get_file_line_message(node)
