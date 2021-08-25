@@ -160,19 +160,18 @@ def parse_file(this_file, this_pkg, packages):
         else:
             for name, symbol in getattr(this_module, 'parse_' + node_type)(parser):
                 symbol['Id'] = hex(id(symbol))
-                if name and name in this_file['Symbols']:
+                if name in this_file['Symbols']:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice in file '{this_file['Path']}'."
                     )
-                elif name:
-                    this_file['Symbols'][name] = symbol
+                this_file['Symbols'][name] = symbol
 
                 if name and name in this_pkg['Symbols']:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice in package '{this_pkg['Path']}'."
                     )
-                elif name:
-                    this_pkg['Symbols'][name] = RefDict(symbol)
+
+                this_pkg['Symbols'][name] = RefDict(symbol)
 
         if not parser.goto_next_sibling():
             break

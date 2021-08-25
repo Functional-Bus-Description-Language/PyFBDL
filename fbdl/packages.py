@@ -108,7 +108,6 @@ class Packages(dict):
 
         return expressions
 
-
     def evaluate(self):
         """Evaluate expressions within packages."""
         self._build_dependency_graph()
@@ -143,3 +142,29 @@ class Packages(dict):
                 raise Exception(
                     f"Can't evaluate package '{pkg['Path']}'. Try to increase the evaluation tries number."
                 )
+
+    def _check_instantiations(self):
+        for pkg_name, pkgs in self.items():
+            for pkg in pkgs:
+                for f in pkg['Files']:
+                    for name, symbol in f['Symbols'].items():
+                        if symbol['Kind'] in [
+                            'Element Definitive Instantiation',
+                            'Element Anonymous Instantiation',
+                        ]:
+                            if symbol['Type'] != 'bus':
+                                raise Exception(
+                                    f"Element of type '{symbol['Type']}' can't be instantiated at the package level. "
+                                    + f"File '{f['Path']}', line number {symbol['Line Number']}."
+                                )
+                            if symbol['Type'] == 'bus':
+                                if name != 'main' or pkg_name != 'main':
+                                    raise Exception(
+                                        f"Bus instantiation must be named 'main', and must be placed in the 'main' package. "
+                                        + f"File '{f['Path']}', line number {symbol['Line Number']}."
+                                    )
+
+    def instantiate(self):
+        self._check_instantiations()
+        self._build_dependency_graph()
+        self._check_dependency_graph()
