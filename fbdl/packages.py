@@ -7,6 +7,7 @@ import networkx as nx
 
 from .expr import ExprDict
 from .refdict import RefDict
+from .validation import ValidElements
 
 
 class Packages(dict):
@@ -144,6 +145,9 @@ class Packages(dict):
                 )
 
     def _check_instantiations(self):
+        invalid_types = list(ValidElements.keys())
+        invalid_types.remove('bus')
+
         for pkg_name, pkgs in self.items():
             for pkg in pkgs:
                 for f in pkg['Files']:
@@ -152,19 +156,19 @@ class Packages(dict):
                             'Element Definitive Instantiation',
                             'Element Anonymous Instantiation',
                         ]:
-                            if symbol['Type'] != 'bus':
+                            if symbol['Type'] in invalid_types:
                                 raise Exception(
                                     f"Element of type '{symbol['Type']}' can't be instantiated at the package level. "
                                     + f"File '{f['Path']}', line number {symbol['Line Number']}."
                                 )
-                            if symbol['Type'] == 'bus':
+                            elif symbol['Type'] == 'bus':
                                 if name != 'main' or pkg_name != 'main':
                                     raise Exception(
                                         f"Bus instantiation must be named 'main', and must be placed in the 'main' package. "
                                         + f"File '{f['Path']}', line number {symbol['Line Number']}."
                                     )
 
-    def instantiate(self):
+    def check(self):
         self._check_instantiations()
         self._build_dependency_graph()
         self._check_dependency_graph()
