@@ -131,6 +131,7 @@ def parse(packages):
     for pkg_name, pkgs in packages.items():
         for pkg in pkgs:
             for f in pkg['Files']:
+                f['Parent'] = RefDict(pkg)
                 parse_file(f, pkg, packages)
 
 
