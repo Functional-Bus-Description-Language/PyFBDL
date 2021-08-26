@@ -283,8 +283,9 @@ def parse_element_body(parser):
                 symbol['Id'] = hex(idgen.generate())
                 if name and name in symbols:
                     raise Exception(
-                        f"Symbol '{name}' defined at least twice within the same element body. "
-                        + parser.file_line_msg(node)
+                        f"Symbol '{name}' defined at least twice within the same element body.\n"
+                        + f"File '{parser.this_file['Path']}'.\n"
+                        + f"First occurrence line {symbols[name]['Line Number']}, second line {symbol['Line Number']}."
                     )
                 elif name:
                     symbols[name] = symbol
@@ -376,7 +377,6 @@ def parse_parameter_list(parser):
 
         if parser.node.children[i + 1].type in [',', ')']:
             for p in params:
-                print(p)
                 if name == p['Name']:
                     raise Exception(
                         f"Parameter '{name}' defined at least twice in parameter list.\n"
@@ -393,7 +393,7 @@ def parse_parameter_list(parser):
     for p in params:
         if with_default and p.get('Default Value') is None:
             raise Exception(
-                "Parameters without default value must precede the ones with default value. "
+                "Parameters without default value must precede the ones with default value.\n"
                 + parser.file_line_msg(node)
             )
 
