@@ -31,7 +31,7 @@ class ParserBase:
     def get_node_string(self, node):
         return self.code[node.start_byte : node.end_byte].decode('utf8')
 
-    def get_file_line_message(self, node):
+    def file_line_msg(self, node):
         return f"File '{self.this_file['Path']}', line {node.start_point[0] + 1}."
 
     def check_for_errors(self):
@@ -166,7 +166,8 @@ def parse_file(this_file, this_pkg, packages):
                 symbol['Id'] = hex(idgen.generate())
                 if name in this_file['Symbols']:
                     raise Exception(
-                        f"Symbol '{name}' defined at least twice in file '{this_file['Path']}'."
+                        f"Symbol '{name}' defined at least twice in file '{this_file['Path']}' scope.\n"
+                        + f"First occurrence line {this_file['Symbols'][name]['Line Number']}, second line {symbol['Line Number']}."
                     )
                 this_file['Symbols'][name] = symbol
 
@@ -198,8 +199,8 @@ def parse_argument_list(parser):
         if parser.node.children[i + 1].type in [',', ')']:
             if name and name in names:
                 raise Exception(
-                    f"Argument '{name}' assigned at least twice in argument list. "
-                    + parser.get_file_line_message(node)
+                    f"Argument '{name}' assigned at least twice in argument list.\n"
+                    + parser.file_line_msg(node)
                 )
 
             arg = {'Value': val}
@@ -216,7 +217,7 @@ def parse_argument_list(parser):
         if with_name and 'Name' not in a:
             raise Exception(
                 "Arguments without name must precede the ones with name. "
-                + parser.get_file_line_message(node)
+                + parser.file_line_msg(node)
             )
 
         if 'Name' in a:
@@ -265,7 +266,7 @@ def parse_element_body(parser):
             if name in properties:
                 raise Exception(
                     f"Property '{name}' assigned at least twice within the same element body. "
-                    + parser.get_file_line_message(node)
+                    + parser.file_line_msg(node)
                 )
 
             properties[name] = {'Value': value, 'Line Number': line_number}
@@ -283,7 +284,7 @@ def parse_element_body(parser):
                 if name and name in symbols:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice within the same element body. "
-                        + f"File '{parser.this_file['Path']}', line {node.start_point[0] + 1}."
+                        + parser.file_line_msg(node)
                     )
                 elif name:
                     symbols[name] = symbol
@@ -374,11 +375,13 @@ def parse_parameter_list(parser):
             default_value = expr.build_expression(parser, node)
 
         if parser.node.children[i + 1].type in [',', ')']:
-            if name in params:
-                raise Exception(
-                    f"Parameter '{name}' defined at least twice in parameter list. "
-                    + parser.get_file_line_message(node)
-                )
+            for p in params:
+                print(p)
+                if name == p['Name']:
+                    raise Exception(
+                        f"Parameter '{name}' defined at least twice in parameter list.\n"
+                        + parser.file_line_msg(node)
+                    )
 
             param = {'Name': name}
             if default_value:
@@ -391,7 +394,7 @@ def parse_parameter_list(parser):
         if with_default and p.get('Default Value') is None:
             raise Exception(
                 "Parameters without default value must precede the ones with default value. "
-                + parser.get_file_line_message(node)
+                + parser.file_line_msg(node)
             )
 
         if p.get('Default Value'):
