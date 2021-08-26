@@ -348,7 +348,10 @@ def parse_multi_constant_definition(parser):
     symbols = []
 
     for i in range(len(parser.node.children) // 3):
-        symbol = {'Kind': 'Constant'}
+        symbol = {
+            'Kind': 'Constant',
+            'Line Number': parser.node.children[i * 3 + 1].start_point[0] + 1
+        }
         name = parser.get_node_string(parser.node.children[i * 3 + 1])
 
         expression = expr.build_expression(parser, parser.node.children[i * 3 + 3])
@@ -410,7 +413,10 @@ def parse_propery_assignment(parser):
 
 
 def parse_single_constant_definition(parser):
-    symbol = {'Kind': 'Constant'}
+    symbol = {
+        'Kind': 'Constant',
+        'Line Number': parser.node.children[1].start_point[0] + 1
+    }
     name = parser.get_node_string(parser.node.children[1])
 
     expression = expr.build_expression(parser, parser.node.children[3])
