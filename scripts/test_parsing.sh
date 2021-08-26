@@ -9,6 +9,7 @@ export PYTHONPATH=$PWD
 
 cd tests/parsing/
 
+echo -e "Running parsing tests\n"
 echo -e "Testing valid constructs\n"
 
 for dir in $(find valid/ -maxdepth 1 -mindepth 1 -type d);
@@ -26,3 +27,5 @@ do
 	cd ../..
 	echo
 done
+
+echo -e "All \e[1;32mPASSED\e[0m!"
