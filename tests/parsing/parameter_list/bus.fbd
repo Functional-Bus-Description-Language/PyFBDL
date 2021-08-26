@@ -1,0 +1,10 @@
+mask my_mask(A, B)
+	atomic = A
+	width = B
+
+config my_config(W=10)
+	width = W
+
+status my_status(a, b=false)
+	atomic = b
+	width = a

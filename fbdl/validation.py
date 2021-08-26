@@ -10,6 +10,10 @@ ValidElements = {
         'Valid Elements': ('block', 'config', 'func', 'mask', 'status'),
         'Valid Properties': ('doc', 'masters', 'width'),
     },
+    'config': {
+        'Valid Elements': (),
+        'Valid Properties': ('atomic', 'doc', 'width'),
+    },
     'func': {'Valid Elements': ('param'), 'Valid Properties': ('doc')},
     'mask': {
         'Valid Elements': (),
@@ -18,6 +22,10 @@ ValidElements = {
     'param': {
         'Valid Elements': (),
         'Valid Properties': ('default', 'doc', 'range', 'width'),
+    },
+    'status': {
+        'Valid Elements': (),
+        'Valid Properties': ('atomic', 'doc', 'width'),
     },
 }
 
