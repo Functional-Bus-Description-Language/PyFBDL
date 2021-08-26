@@ -1,0 +1,2 @@
+Exception: Property 'width' assigned at least twice within the same element body.
+File 'bus.fbd', line 3.
