@@ -216,7 +216,7 @@ def parse_argument_list(parser):
     for a in args:
         if with_name and 'Name' not in a:
             raise Exception(
-                "Arguments without name must precede the ones with name. "
+                "Arguments without name must precede the ones with name.\n"
                 + parser.file_line_msg(node)
             )
 
@@ -265,7 +265,7 @@ def parse_element_body(parser):
 
             if name in properties:
                 raise Exception(
-                    f"Property '{name}' assigned at least twice within the same element body. "
+                    f"Property '{name}' assigned at least twice within the same element body.\n"
                     + parser.file_line_msg(node)
                 )
 
