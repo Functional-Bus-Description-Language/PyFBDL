@@ -1,0 +1,2 @@
+Exception: Parameters without default value must precede the ones with default value.
+File 'bus.fbd', line 1.

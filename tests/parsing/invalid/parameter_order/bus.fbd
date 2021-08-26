@@ -1,0 +1,2 @@
+config my_config(width=10, foo)
+	width = width
