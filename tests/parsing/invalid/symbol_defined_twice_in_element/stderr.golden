@@ -1,0 +1,3 @@
+Exception: Symbol 'a' defined at least twice within the same element body.
+File 'bus.fbd'.
+First occurrence line 2, second line 4.

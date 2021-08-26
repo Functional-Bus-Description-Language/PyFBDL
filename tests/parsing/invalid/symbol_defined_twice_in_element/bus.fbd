@@ -1,0 +1,5 @@
+bus my_bus
+	const a = 10
+
+	mask a
+		width = 6
