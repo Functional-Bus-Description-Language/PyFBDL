@@ -96,7 +96,7 @@ def traverse_tree(tree):
             if cursor.goto_next_sibling():
                 retracing = False
 
-
+# TODO below must be done after parsing and before instantiation.
 def validate_properties_and_elements(parser, symbol):
     # Check if properties are valid for given element type.
     wrong_prop = None
@@ -249,8 +249,6 @@ def parse_element_anonymous_instantiation(parser):
         if symbols:
             symbol['Symbols'] = symbols
 
-    validate_properties_and_elements(parser, symbol)
-
     return [(name, symbol)]
 
 
@@ -315,8 +313,6 @@ def parse_element_definition(parser):
             symbol['Properties'] = properties
         if symbols:
             symbol['Symbols'] = symbols
-
-    validate_properties_and_elements(parser, symbol)
 
     return [(name, symbol)]
 
