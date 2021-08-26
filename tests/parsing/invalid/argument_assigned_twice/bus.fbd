@@ -1,0 +1,4 @@
+bus my_bus(m=2)
+	masters = m
+
+main my_bus(m=1, m=2)
