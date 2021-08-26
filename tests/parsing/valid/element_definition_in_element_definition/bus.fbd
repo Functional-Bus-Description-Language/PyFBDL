@@ -1,0 +1,5 @@
+bus my_bus(m)
+	masters = m
+
+	mask my_mask(w)
+		width = w
