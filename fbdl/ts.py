@@ -166,7 +166,7 @@ def parse_file(this_file, this_pkg, packages):
                 symbol['Id'] = hex(idgen.generate())
                 if name in this_file['Symbols']:
                     raise Exception(
-                        f"Symbol '{name}' defined at least twice in file '{this_file['Path']}' scope.\n"
+                        f"Symbol '{name}' defined at least twice in file '{this_file['Path']}'.\n"
                         + f"First occurrence line {this_file['Symbols'][name]['Line Number']}, second line {symbol['Line Number']}."
                     )
                 this_file['Symbols'][name] = symbol
