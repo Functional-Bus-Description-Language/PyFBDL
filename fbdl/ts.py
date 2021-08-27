@@ -11,8 +11,9 @@ this_module = sys.modules[__name__]
 
 from tree_sitter import Language, Parser, TreeCursor
 
-Language.build_library(dirname + '/../build/fbdl.so', [dirname + '/../submodules/tree-sitter-fbdl/'])
-FBDLANG = Language(dirname + '/../build/fbdl.so', 'fbdl')
+print(dirname)
+Language.build_library('./build/fbdl.so', ['./submodules/tree-sitter-fbdl/'])
+FBDLANG = Language('./build/fbdl.so', 'fbdl')
 
 ts_parser = Parser()
 ts_parser.set_language(FBDLANG)
