@@ -1,5 +1,5 @@
 main bus
 	const A = 5
 
-	mask my_mask
+	type my_mask mask
 		width = A

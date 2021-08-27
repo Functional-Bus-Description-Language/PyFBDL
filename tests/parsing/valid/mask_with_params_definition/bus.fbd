@@ -1,3 +1,3 @@
-mask my_mask(FOO, BAR=2)
+type my_mask(FOO, BAR=2) mask
 	atomic = FOO
 	width = BAR

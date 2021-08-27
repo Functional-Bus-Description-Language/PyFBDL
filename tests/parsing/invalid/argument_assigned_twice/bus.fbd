@@ -1,4 +1,4 @@
-bus my_bus(m=2)
+type my_bus(m=2) bus
 	masters = m
 
 main my_bus(m=1, m=2)

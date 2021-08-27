@@ -1,10 +1,10 @@
-mask my_mask(A, B)
+type my_mask(A, B) mask
 	atomic = A
 	width = B
 
-config my_config(W=10)
+type my_config(W=10) config
 	width = W
 
-status my_status(a, b=false)
+type my_status(a, b=false) status
 	atomic = b
 	width = a

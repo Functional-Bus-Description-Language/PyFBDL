@@ -1,0 +1,3 @@
+Exception: Space character ' ' is not allowed in indent.
+Use tab character '\t'.
+File 'bus.fbd', line number 2.

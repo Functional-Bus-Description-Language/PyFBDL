@@ -4,7 +4,7 @@
                       'Parent': RD to '0x1001',
                       'Path': 'bus.fbd',
                       'Symbols': {'my_mask': {'Id': '0x1002',
-                                              'Kind': 'Element Definition',
+                                              'Kind': 'Element Type Definition',
                                               'Line Number': 1,
                                               'Parameter List': ({'Name': 'FOO'},
                                                                  {'Default Value': {'Child': {'Kind': 'decimal_literal',
@@ -26,5 +26,5 @@
                                               'Type': 'mask'}}}],
            'Id': '0x1001',
            'Kind': 'Package',
-           'Path': '/home/mkru/workspace/FBDL/PyFBDL/tests/mask_with_params_definition/bus.fbd',
+           'Path': '/home/mkru/workspace/FBDL/PyFBDL/tests/parsing/valid/mask_with_params_definition/bus.fbd',
            'Symbols': {'my_mask': RD to '0x1002'}}]}

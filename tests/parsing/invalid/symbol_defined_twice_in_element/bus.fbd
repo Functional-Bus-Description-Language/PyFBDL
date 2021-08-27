@@ -1,5 +1,5 @@
-bus my_bus
+type my_bus bus
 	const a = 10
 
-	mask a
+	type a mask
 		width = 6

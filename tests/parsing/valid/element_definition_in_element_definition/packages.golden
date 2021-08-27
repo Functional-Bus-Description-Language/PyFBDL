@@ -4,7 +4,7 @@
                       'Parent': RD to '0x1001',
                       'Path': 'bus.fbd',
                       'Symbols': {'my_bus': {'Id': '0x1003',
-                                             'Kind': 'Element Definition',
+                                             'Kind': 'Element Type Definition',
                                              'Line Number': 1,
                                              'Parameter List': ({'Name': 'm'},),
                                              'Properties': {'masters': {'Line Number': 2,
@@ -14,6 +14,7 @@
                                                                                   'String': 'm'}}},
                                              'Symbols': {'my_mask': {'Id': '0x1002',
                                                                      'Kind': 'Element '
+                                                                             'Type '
                                                                              'Definition',
                                                                      'Line Number': 4,
                                                                      'Parameter List': ({'Name': 'w'},),

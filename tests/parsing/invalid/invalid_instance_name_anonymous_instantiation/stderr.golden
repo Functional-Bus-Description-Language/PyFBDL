@@ -1,0 +1,3 @@
+Exception: Invalid instance name 'mask'.
+Element instance can not have the same name as base type.
+File 'bus.fbd', line 2.

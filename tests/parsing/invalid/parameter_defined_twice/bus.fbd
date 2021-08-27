@@ -1,1 +1,1 @@
-mask my_mask(A,A)
+type my_mask(A,A) mask

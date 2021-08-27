@@ -116,7 +116,7 @@ def validate_properties_and_elements(parser, symbol):
             for k, v in symbol['Symbols'].items()
             if v['Kind']
             in [
-                'Element Definition',
+                'Element Type Definition',
                 'Element Anonymous Instantiation',
                 'Element Definitive Instantiation',
             ]
@@ -250,6 +250,13 @@ def parse_element_anonymous_instantiation(parser):
         if symbols:
             symbol['Symbols'] = symbols
 
+    if name in ValidElements.keys():
+        raise Exception(
+            f"Invalid instance name '{name}'.\n"
+            + "Element instance can not have the same name as base type.\n"
+            + parser.file_line_msg(parser.node)
+
+        )
     return [(name, symbol)]
 
 
@@ -271,7 +278,7 @@ def parse_element_body(parser):
 
             properties[name] = {'Value': value, 'Line Number': line_number}
         elif node.type in [
-            'element_definition',
+            'element_type_definition',
             'element_anonymous_instantiation',
             'element_definitive_instantiation',
             'single_constant_definition',
@@ -293,28 +300,41 @@ def parse_element_body(parser):
     return properties, symbols
 
 
-def parse_element_definition(parser):
+def parse_element_type_definition(parser):
     name = parser.get_node_string(parser.node.children[1])
     symbol = {
-        'Kind': 'Element Definition',
-        'Type': parser.get_node_string(parser.node.children[0]),
+        'Kind': 'Element Type Definition',
         'Line Number': parser.node.start_point[0] + 1,
     }
 
-    num_of_children = len(parser.node.children)
+    type_node = None
+    for node in parser.node.children[2:]:
+        if node.type == 'parameter_list':
+            symbol['Parameter List'] = parse_parameter_list(
+                ParserFromNode(parser, node)
+            )
+        elif node.type == 'identifier':
+            symbol['Type'] = parser.get_node_string(node)
+            type_node = node
+        elif node.type == 'argument_list':
+            symbol['Argument List'] = parse_argument_list(
+                ParserFromNode(parser, node)
+            )
+        elif node.type == 'element_body':
+            properties, symbols = parse_element_body(
+                ParserFromNode(parser, parser.node.children[-1])
+            )
+            if properties:
+                symbol['Properties'] = properties
+            if symbols:
+                symbol['Symbols'] = symbols
 
-    if num_of_children > 2 and parser.node.children[2].type == 'parameter_list':
-        symbol['Parameter List'] = parse_parameter_list(
-            ParserFromNode(parser, parser.node.children[2])
-        )
-    if num_of_children > 2 and parser.node.children[-1].type == 'element_body':
-        properties, symbols = parse_element_body(
-            ParserFromNode(parser, parser.node.children[-1])
-        )
-        if properties:
-            symbol['Properties'] = properties
-        if symbols:
-            symbol['Symbols'] = symbols
+    if 'Argument List' in symbol:
+        if symbol['Type'] in ValidElements.keys():
+            raise Exception(
+                f"Base type '{symbol['Type']}' does not accept argument list.\n"
+                + parser.file_line_msg(type_node)
+            )
 
     return [(name, symbol)]
 
@@ -337,6 +357,13 @@ def parse_element_definitive_instantiation(parser):
     if parser.node.children[-1].type == 'argument_list':
         symbol['Argument List'] = parse_argument_list(
             ParserFromNode(parser, parser.node.children[-1])
+        )
+
+    if name in ValidElements.keys():
+        raise Exception(
+            f"Invalid instance name '{name}'.\n"
+            + "Element instance can not have the same name as base type.\n"
+            + parser.file_line_msg(parser.node)
         )
 
     return [(name, symbol)]

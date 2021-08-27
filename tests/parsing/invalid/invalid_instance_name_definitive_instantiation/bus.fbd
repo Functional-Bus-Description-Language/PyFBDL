@@ -1,0 +1,2 @@
+type my_bus bus
+	mask some_type

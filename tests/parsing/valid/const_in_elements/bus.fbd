@@ -1,7 +1,7 @@
-mask my_mask
+type  my_mask mask
 	const A = 1
 
-func my_func
+type my_func func
 	const
 		A = 1
 		B = 2

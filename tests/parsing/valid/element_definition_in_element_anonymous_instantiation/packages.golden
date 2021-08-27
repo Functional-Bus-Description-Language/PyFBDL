@@ -17,6 +17,7 @@
                                                                        'String': '5'}},
                                                        'my_mask': {'Id': '0x1003',
                                                                    'Kind': 'Element '
+                                                                           'Type '
                                                                            'Definition',
                                                                    'Line Number': 4,
                                                                    'Properties': {'width': {'Line Number': 5,
@@ -28,5 +29,5 @@
                                            'Type': 'bus'}}}],
            'Id': '0x1001',
            'Kind': 'Package',
-           'Path': '/home/mkru/workspace/FBDL/PyFBDL/tests/parsing/valid/element_definition_in_anonymous_element_instantiation/bus.fbd',
+           'Path': '/home/mkru/workspace/FBDL/PyFBDL/tests/parsing/valid/element_definition_in_element_anonymous_instantiation/bus.fbd',
            'Symbols': {'main': RD to '0x1004'}}]}

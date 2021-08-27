@@ -158,13 +158,13 @@ class Packages(dict):
                         ]:
                             if symbol['Type'] in invalid_types:
                                 raise Exception(
-                                    f"Element of type '{symbol['Type']}' can't be instantiated at the package level. "
+                                    f"Element of type '{symbol['Type']}' can't be instantiated at the package level.\n"
                                     + f"File '{f['Path']}', line number {symbol['Line Number']}."
                                 )
                             elif symbol['Type'] == 'bus':
                                 if name != 'main' or pkg_name != 'main':
                                     raise Exception(
-                                        f"Bus instantiation must be named 'main', and must be placed in the 'main' package. "
+                                        f"Bus instantiation must be named 'main', and must be placed in the 'main' package.\n"
                                         + f"File '{f['Path']}', line number {symbol['Line Number']}."
                                     )
 

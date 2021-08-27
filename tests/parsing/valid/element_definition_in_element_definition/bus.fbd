@@ -1,5 +1,5 @@
-bus my_bus(m)
+type my_bus(m) bus
 	masters = m
 
-	mask my_mask(w)
+	type my_mask(w) mask
 		width = w

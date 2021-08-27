@@ -112,7 +112,8 @@ def check_indent(file_):
         indent = get_indent(line)
         if indent is None:
             raise Exception(
-                "Space character ' ' is not allowed in indent. Use tab character '\\t'. "
+                "Space character ' ' is not allowed in indent.\n"
+                + "Use tab character '\\t'.\n"
                 + f"File '{file_.name}', line number {i + 1}."
             )
 

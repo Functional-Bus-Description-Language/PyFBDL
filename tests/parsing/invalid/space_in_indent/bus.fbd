@@ -1,2 +1,2 @@
 type my_mask mask
-	width = 10
+    width = 1
