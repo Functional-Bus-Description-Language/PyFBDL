@@ -1,0 +1,13 @@
+{'main': [{'Files': [{'Handle': <_io.TextIOWrapper name='bus.fbd' mode='r' encoding='UTF-8'>,
+                      'Id': '0x1000',
+                      'Kind': 'File',
+                      'Parent': RD to '0x1001',
+                      'Path': 'bus.fbd',
+                      'Symbols': {'my_type': {'Id': '0x1002',
+                                              'Kind': 'Element Type Definition',
+                                              'Line Number': 1,
+                                              'Type': 'foo.bar'}}}],
+           'Id': '0x1001',
+           'Kind': 'Package',
+           'Path': '/home/mkru/workspace/FBDL/PyFBDL/tests/parsing/valid/element_type_definition_qualified_identifier/bus.fbd',
+           'Symbols': {'my_type': RD to '0x1002'}}]}

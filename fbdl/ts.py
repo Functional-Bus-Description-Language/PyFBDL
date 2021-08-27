@@ -313,7 +313,7 @@ def parse_element_type_definition(parser):
             symbol['Parameter List'] = parse_parameter_list(
                 ParserFromNode(parser, node)
             )
-        elif node.type == 'identifier':
+        elif node.type in ['identifier', 'qualified_identifier']:
             symbol['Type'] = parser.get_node_string(node)
             type_node = node
         elif node.type == 'argument_list':
