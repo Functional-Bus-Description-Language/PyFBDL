@@ -35,6 +35,8 @@ def check_path(path, packages):
         if pkg_name == "main":
             raise Exception(f"Package can not be named 'main': {path}.")
 
+        log.debug(f"Adding package '{pkg_name}', path '{path}'.")
+
         pkg = {}
         pkg['Path'] = path
         pkg['Files'] = tuple(files)
