@@ -6,7 +6,7 @@
                       'Symbols': {'my_bus': {'Id': '0x1003',
                                              'Kind': 'Element Type Definition',
                                              'Line Number': 1,
-                                             'Parameter List': ({'Name': 'm'},),
+                                             'Parameters': ({'Name': 'm'},),
                                              'Properties': {'masters': {'Line Number': 2,
                                                                         'Value': {'Child': {'Kind': 'identifier',
                                                                                             'String': 'm'},
@@ -17,7 +17,7 @@
                                                                              'Type '
                                                                              'Definition',
                                                                      'Line Number': 4,
-                                                                     'Parameter List': ({'Name': 'w'},),
+                                                                     'Parameters': ({'Name': 'w'},),
                                                                      'Properties': {'width': {'Line Number': 5,
                                                                                               'Value': {'Child': {'Kind': 'identifier',
                                                                                                                   'String': 'w'},

@@ -7,7 +7,7 @@
                                                 'Kind': 'Element Type '
                                                         'Definition',
                                                 'Line Number': 5,
-                                                'Parameter List': ({'Default Value': {'Child': {'Kind': 'decimal_literal',
+                                                'Parameters': ({'Default Value': {'Child': {'Kind': 'decimal_literal',
                                                                                                 'String': '10',
                                                                                                 'Value': 10},
                                                                                       'Kind': 'primary_expression',
@@ -22,7 +22,7 @@
                                   'my_mask': {'Id': '0x1002',
                                               'Kind': 'Element Type Definition',
                                               'Line Number': 1,
-                                              'Parameter List': ({'Name': 'A'},
+                                              'Parameters': ({'Name': 'A'},
                                                                  {'Name': 'B'}),
                                               'Properties': {'atomic': {'Line Number': 2,
                                                                         'Value': {'Child': {'Kind': 'identifier',
@@ -39,7 +39,7 @@
                                                 'Kind': 'Element Type '
                                                         'Definition',
                                                 'Line Number': 8,
-                                                'Parameter List': ({'Name': 'a'},
+                                                'Parameters': ({'Name': 'a'},
                                                                    {'Default Value': {'Child': {'Kind': 'false',
                                                                                                 'String': 'false',
                                                                                                 'Value': False},

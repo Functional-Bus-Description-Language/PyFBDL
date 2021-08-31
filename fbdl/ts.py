@@ -314,14 +314,14 @@ def parse_element_type_definition(parser):
     type_node = None
     for node in parser.node.children[2:]:
         if node.type == 'parameter_list':
-            symbol['Parameter List'] = parse_parameter_list(
+            symbol['Parameters'] = parse_parameter_list(
                 ParserFromNode(parser, node)
             )
         elif node.type in ['identifier', 'qualified_identifier']:
             symbol['Type'] = parser.get_node_string(node)
             type_node = node
         elif node.type == 'argument_list':
-            symbol['Argument List'] = parse_argument_list(
+            symbol['Arguments'] = parse_argument_list(
                 ParserFromNode(parser, node)
             )
         elif node.type == 'element_body':
@@ -335,7 +335,7 @@ def parse_element_type_definition(parser):
                 for _, sym in symbol['Symbols'].items():
                     sym['Parent'] = RefDict(symbol)
 
-    if 'Argument List' in symbol:
+    if 'Arguments' in symbol:
         if symbol['Type'] in ValidElements.keys():
             raise Exception(
                 f"Base type '{symbol['Type']}' does not accept argument list.\n"
@@ -361,7 +361,7 @@ def parse_element_definitive_instantiation(parser):
         symbol['Type'] = parser.get_node_string(parser.node.children[4])
 
     if parser.node.children[-1].type == 'argument_list':
-        symbol['Argument List'] = parse_argument_list(
+        symbol['Arguments'] = parse_argument_list(
             ParserFromNode(parser, parser.node.children[-1])
         )
 

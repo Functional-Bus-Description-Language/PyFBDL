@@ -39,7 +39,7 @@ def instantiate(after_parse_packages):
 
 
 def resolve_argument_list(symbol, parameter_list):
-    args = symbol.get('Argument List', ())
+    args = symbol.get('Arguments', ())
 
     resolved_argument_list = {}
 
@@ -85,9 +85,9 @@ def resolve_argument_lists_in_symbols(symbols):
         if symbol['Type'] in ValidElements:
             continue
 
-        param_list = packages.get_symbol(symbol['Type'], symbol).get('Parameter List')
+        param_list = packages.get_symbol(symbol['Type'], symbol).get('Parameters')
         if param_list:
-            symbol['Resolved Argument List'] = resolve_argument_list(symbol, param_list)
+            symbol['Resolved Arguments'] = resolve_argument_list(symbol, param_list)
         if 'Symbols' in symbol:
             resolve_argument_lists_in_symbols(symbol['Symbols'])
 
@@ -133,7 +133,6 @@ def instantiate_type(type, from_type):
                 if elem['Base Type'] not in ValidElements[inst['Base Type']]['Valid Elements']:
                     raise Exception("Invalid Element.")
 
-                list_name = elem['Base Type'].capitalize() + ' List'
                 if 'Elements' not in inst:
                     inst['Elements'] = {}
                 if name in inst['Elements']:
