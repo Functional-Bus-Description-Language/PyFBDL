@@ -1,0 +1,3 @@
+import "dummy"
+
+const B = dummy.A
