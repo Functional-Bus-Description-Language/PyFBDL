@@ -22,6 +22,60 @@ class Packages(dict):
             name = name[4:]
         return name
 
+    @staticmethod
+    def _get_symbol_foreign_pkg(symbol, start_node):
+        pkg_name, sym = symbol.split('.')
+        node = start_node
+
+        while True:
+            if node['Kind'] == 'File':
+                break
+            else:
+                node = node['Parent']
+
+        imports = node.get('Imports')
+        if not imports:
+            raise Exception(
+                f"Reference to the foreign symbol '{symbol}' in file '{node['Path']}', but file does not import any package."
+            )
+
+        pkg = None
+        for name, dict_ in imports.items():
+            if name == pkg_name:
+                pkg = dict_['Package']
+                break
+
+        if not pkg:
+            raise Exception(
+                f"Reference to the foreign symbol '{symbol}' in file '{node['Path']}', but file does not import package '{pkg_name}'."
+            )
+
+        if sym not in pkg['Symbols']:
+            raise Exception(
+                f"Can not get symbol '{symbol}' in file '{node['Path']}'.\n"
+                + f"Package 'pkg_name' does not have symbol '{sym}'."
+            )
+
+    @staticmethod
+    def get_symbol(symbol, start_node):
+        """Get reference to the symbol. Start searching from given start_node."""
+        node = start_node
+
+        if '.' in symbol:
+            return self._get_symbol_foreign_pkg(symbol, node)
+
+        while True:
+            if node.get('Symbols'):
+                if symbol in node['Symbols']:
+                    return node['Symbols'][symbol]
+
+            if node['Kind'] == 'Package':
+                raise Exception(
+                    f"Can not find symbol '{symbol}' in package '{node['Path']}' starting from node 'foo'."
+                )
+
+            node = node['Parent']
+
     def get_ref_to_pkg(self, path_pattern):
         """Get reference to the package based on the path pattern."""
         # Main package always consists of single file.
@@ -158,7 +212,7 @@ class Packages(dict):
                         ]:
                             if symbol['Type'] in invalid_types:
                                 raise Exception(
-                                    f"Element of type '{symbol['Type']}' can't be instantiated at the package level.\n"
+                                    f"Element of type '{symbol['Type']}' can not be instantiated at the package level.\n"
                                     + f"File '{f['Path']}', line number {symbol['Line Number']}."
                                 )
                             elif symbol['Type'] == 'bus':

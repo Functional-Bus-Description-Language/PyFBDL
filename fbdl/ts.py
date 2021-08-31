@@ -163,12 +163,14 @@ def parse_file(this_file, this_pkg, packages):
             pass
         else:
             for name, symbol in getattr(this_module, 'parse_' + node_type)(parser):
-                symbol['Id'] = hex(idgen.generate())
+                if 'Id' not in symbol:
+                    symbol['Id'] = hex(idgen.generate())
                 if name in this_file['Symbols']:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice in file '{this_file['Path']}'.\n"
                         + f"First occurrence line {this_file['Symbols'][name]['Line Number']}, second line {symbol['Line Number']}."
                     )
+                symbol['Parent'] = RefDict(this_file)
                 this_file['Symbols'][name] = symbol
 
                 if name and name in this_pkg['Symbols']:
@@ -306,6 +308,8 @@ def parse_element_type_definition(parser):
         'Kind': 'Element Type Definition',
         'Line Number': parser.node.start_point[0] + 1,
     }
+    # 'Id' must be assigned here, because 'Parent' has to be set for children nodes.
+    symbol['Id'] = hex(idgen.generate())
 
     type_node = None
     for node in parser.node.children[2:]:
@@ -328,6 +332,8 @@ def parse_element_type_definition(parser):
                 symbol['Properties'] = properties
             if symbols:
                 symbol['Symbols'] = symbols
+                for _, sym in symbol['Symbols'].items():
+                    sym['Parent'] = RefDict(symbol)
 
     if 'Argument List' in symbol:
         if symbol['Type'] in ValidElements.keys():

@@ -7,6 +7,7 @@ import sys
 
 from fbdl import pre
 from fbdl import ts
+from fbdl import bus
 
 VERSION = "0.0.0"
 
@@ -28,6 +29,13 @@ def parse_cmd_line_args():
         metavar='file_path',
     )
 
+    parser.add_argument(
+        '-i',
+        help="Dump instantiation dictionary to a file.",
+        type=argparse.FileType('w'),
+        metavar='file_path',
+    )
+
     return parser.parse_args()
 
 
@@ -43,12 +51,15 @@ def main():
 
     packages = pre.prepare_packages(cmd_line_args.main)
     ts.parse(packages)
-    packages.check()
-
     if cmd_line_args.p:
         cmd_line_args.p.write(pformat(packages) + '\n')
         cmd_line_args.p.close()
+    packages.check()
 
+    main_bus = bus.instantiate(packages)
+    if cmd_line_args.i:
+        cmd_line_args.i.write(pformat(main_bus) + '\n')
+        cmd_line_args.i.close()
 
 if __name__ == "__main__":
     main()
