@@ -4,7 +4,7 @@ Module for code utilizing tree-sitter.
 import os
 dirname = os.path.dirname(os.path.abspath(__file__))
 
-from pprint import pformat
+from pprint import pprint, pformat
 import sys
 
 this_module = sys.modules[__name__]
@@ -234,6 +234,7 @@ def parse_element_anonymous_instantiation(parser):
         'Kind': 'Element Anonymous Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
     }
+    symbol['Id'] = hex(idgen.generate())
 
     if parser.node.children[1].type == '[':
         symbol['Number'] = expr.build_expression(parser, parser.node.children[2])
@@ -250,6 +251,8 @@ def parse_element_anonymous_instantiation(parser):
         if properties:
             symbol['Properties'] = properties
         if symbols:
+            for _, sym in symbols.items():
+                sym['Parent'] = RefDict(symbol)
             symbol['Symbols'] = symbols
 
     if name in ValidElements.keys():
@@ -331,9 +334,9 @@ def parse_element_type_definition(parser):
             if properties:
                 symbol['Properties'] = properties
             if symbols:
-                symbol['Symbols'] = symbols
-                for _, sym in symbol['Symbols'].items():
+                for _, sym in symbols.items():
                     sym['Parent'] = RefDict(symbol)
+                symbol['Symbols'] = symbols
 
     if 'Arguments' in symbol:
         if symbol['Type'] in ValidElements.keys():
