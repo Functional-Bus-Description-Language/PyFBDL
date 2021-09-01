@@ -25,7 +25,7 @@ def check_path(path, packages):
         if os.path.isfile(file_path) and f.endswith(".fbd"):
             if not pkg_name:
                 pkg_name = Packages.get_pkg_name(os.path.basename(path))
-            file_['Id'] = hex(idgen.generate())
+            file_['Id'] = idgen.generate()
             file_['Kind'] = 'File'
             file_['Path'] = file_path
             file_['Handle'] = open(file_path, encoding='UTF-8')
@@ -40,7 +40,7 @@ def check_path(path, packages):
         pkg = {}
         pkg['Path'] = path
         pkg['Files'] = tuple(files)
-        pkg['Id'] = hex(idgen.generate())
+        pkg['Id'] = idgen.generate()
         pkg['Kind'] = 'Package'
         if pkg_name in packages:
             packages[pkg_name].append(pkg)
@@ -142,7 +142,7 @@ def add_main_file(main, packages):
         {
             'Files': [
                 {
-                    'Id': hex(idgen.generate()),
+                    'Id': idgen.generate(),
                     'Kind': 'File',
                     'Path': main,
                     'Handle': open(main, encoding='UTF-8'),
@@ -152,7 +152,7 @@ def add_main_file(main, packages):
             'Kind': 'Package',
         }
     )
-    packages['main'][0]['Id'] = hex(idgen.generate())
+    packages['main'][0]['Id'] = idgen.generate()
 
 
 def prepare_packages(main):

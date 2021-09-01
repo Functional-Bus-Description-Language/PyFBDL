@@ -11,4 +11,6 @@ def generate():
     global current_id
 
     current_id += 1
-    return current_id
+
+    hex_val = hex(current_id)
+    return hex_val[0:2] + hex_val[2:].upper()

@@ -167,7 +167,7 @@ def parse_file(this_file, this_pkg, packages):
         else:
             for name, symbol in getattr(this_module, 'parse_' + node_type)(parser):
                 if 'Id' not in symbol:
-                    symbol['Id'] = hex(idgen.generate())
+                    symbol['Id'] = idgen.generate()
                 if name in this_file['Symbols']:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice in file '{this_file['Path']}'.\n"
@@ -237,7 +237,7 @@ def parse_element_anonymous_instantiation(parser):
         'Kind': 'Element Anonymous Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
     }
-    symbol['Id'] = hex(idgen.generate())
+    symbol['Id'] = idgen.generate()
 
     if parser.node.children[1].type == '[':
         symbol['Number'] = expr.build_expression(parser, parser.node.children[2])
@@ -295,7 +295,7 @@ def parse_element_body(parser, symbol):
             for name, symbol in getattr(this_module, 'parse_' + node.type)(
                 ParserFromNode(parser, node)
             ):
-                symbol['Id'] = hex(idgen.generate())
+                symbol['Id'] = idgen.generate()
                 if name and name in symbols:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice within the same element body.\n"
@@ -315,7 +315,7 @@ def parse_element_type_definition(parser):
         'Line Number': parser.node.start_point[0] + 1,
     }
     # 'Id' must be assigned here, because 'Parent' has to be set for children nodes.
-    symbol['Id'] = hex(idgen.generate())
+    symbol['Id'] = idgen.generate()
 
     type_node = None
     for node in parser.node.children[2:]:
