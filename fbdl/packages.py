@@ -46,7 +46,9 @@ class Packages(dict):
                                 resolved_arguments[p['Name']] = copy.copy(a['Value'])
                                 break
                         else:
-                            resolved_arguments[p['Name']] = copy.copy(p['Default Value'])
+                            resolved_arguments[p['Name']] = copy.copy(
+                                p['Default Value']
+                            )
                 else:
                     if i < len(args):
                         resolved_arguments[p['Name']] = copy.copy(args[i]['Value'])
@@ -60,10 +62,10 @@ class Packages(dict):
                 else:
                     resolved_arguments[p['Name']] = copy.copy(p['Default Value'])
 
-#        for _, r in resolved_arguments.items():
-#            pprint(r.symbol)
-#            r.symbol = symbol
-#            pprint(r.symbol)
+        #        for _, r in resolved_arguments.items():
+        #            pprint(r.symbol)
+        #            r.symbol = symbol
+        #            pprint(r.symbol)
 
         return resolved_arguments
 
@@ -80,7 +82,9 @@ class Packages(dict):
             if symbol['Type'] not in ValidElements:
                 param_list = self.get_symbol(symbol['Type'], symbol).get('Parameters')
                 if param_list:
-                    symbol['Resolved Arguments'] = self.resolve_argument_list(symbol, param_list)
+                    symbol['Resolved Arguments'] = self.resolve_argument_list(
+                        symbol, param_list
+                    )
 
             if 'Symbols' in symbol:
                 self.resolve_argument_lists_in_symbols(symbol['Symbols'])
@@ -223,6 +227,7 @@ class Packages(dict):
 
     def _get_expressions(self, node):
         from .expr import ExprDict
+
         expressions = []
 
         type_ = type(node)
