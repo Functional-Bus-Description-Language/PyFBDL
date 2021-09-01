@@ -54,7 +54,6 @@ def main():
     if cmd_line_args.p:
         cmd_line_args.p.write(pformat(packages) + '\n')
         cmd_line_args.p.close()
-    packages.check()
 
     main_bus = bus.instantiate(packages)
     if cmd_line_args.i:

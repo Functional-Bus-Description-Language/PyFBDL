@@ -1,3 +1,4 @@
+import logging as log
 import sys
 from pprint import pprint
 
@@ -33,76 +34,11 @@ def instantiate(after_parse_packages):
 
     set_bus_width()
 
-    resolve_argument_lists()
-
     bus = {
         'main': instantiate_element(packages['main'][0]['Symbols']['main'])
     }
 
     return bus
-
-
-def resolve_argument_list(symbol, parameter_list):
-    args = symbol.get('Arguments', ())
-
-    resolved_argument_list = {}
-
-    in_positional_arguments = True
-    for i, p in enumerate(parameter_list):
-        if in_positional_arguments:
-            if i < len(args):
-                arg_name = args[i].get('Name')
-            else:
-                in_positional_arguments = False
-                arg_name = None
-
-            if arg_name:
-                in_positional_arguments = False
-                if arg_name == p['Name']: 
-                    resolved_argument_list[p['Name']] = args[i]['Value']
-                else:
-                    for a in args:
-                        if a['Name'] == p['Name']:
-                            resolved_argument_list[p['Name']] = a['Value']
-                            break
-                    else:
-                        resolved_argument_list[p['Name']] = p['Default Value']
-            else:
-                if i < len(args):
-                    resolved_argument_list[p['Name']] = args[i]['Value']
-                else:
-                    resolved_argument_list[p['Name']] = p['Default Value']
-        else:
-            for a in args:
-                if a['Name'] == p['Name']:
-                    resolved_argument_list[p['Name']] = a['Value']
-                    break
-            else:
-                resolved_argument_list[p['Name']] = p['Default Value']
-
-    return resolved_argument_list
-
-
-def resolve_argument_lists_in_symbols(symbols):
-    for name, symbol in symbols.items():
-        if symbol['Kind'] not in ['Element Definitive Instantiation', 'Element Type Definition']:
-            continue
-
-        # Base elements can not have parameter list.
-        if symbol['Type'] in ValidElements:
-            continue
-
-        param_list = packages.get_symbol(symbol['Type'], symbol).get('Parameters')
-        if param_list:
-            symbol['Resolved Arguments'] = resolve_argument_list(symbol, param_list)
-        if 'Symbols' in symbol:
-            resolve_argument_lists_in_symbols(symbol['Symbols'])
-
-
-def resolve_argument_lists():
-    for _, pkgs in packages.items():
-        for pkg in pkgs:
-            resolve_argument_lists_in_symbols(pkg['Symbols'])
 
 
 def resolve_to_base_type(symbol):
@@ -115,7 +51,16 @@ def resolve_to_base_type(symbol):
     return type_chain
 
 
-def instantiate_type(type, from_type):
+def instantiate_type(type, from_type, resolved_arguments):
+    if resolved_arguments is not None:
+        type['Resolved Arguments'] = resolved_arguments
+
+#    from_type_type = "None"
+#    if from_type is not None:
+#        pprint(from_type)
+#        from_type_type = from_type['Type']
+#    log.debug(f"Instantiating type '{type['Type']}' from type '{from_type_type}'.")
+
     if from_type == None:
         inst = {
             'Base Type': type['Type'],
@@ -150,8 +95,11 @@ def instantiate_type(type, from_type):
 
 def instantiate_type_chain(type_chain):
     inst = None
-    for t in type_chain:
-        inst = instantiate_type(t, inst)
+    for i, t in enumerate(type_chain):
+        resolved_arguments = None
+        if (i + 1) < len(type_chain) and 'Resolved Arguments' in type_chain[i + 1]:
+            resolved_arguments = type_chain[i + 1]['Resolved Arguments']
+        inst = instantiate_type(t, inst, resolved_arguments)
 
     fill_missing_properties(inst)
     return inst
@@ -189,3 +137,12 @@ def fill_missing_properties_func(inst):
 def fill_missing_properties_bus(inst):
     if 'masters' not in inst['Properties']:
         inst['Properties']['masters'] = 1
+
+def fill_missing_properties_mask(inst):
+    if 'width' not in inst['Properties']:
+        inst['Properties']['width'] = 32
+    if 'atomic' not in inst['Properties']:
+        val = False
+        if inst['Properties']['width'] > BUS_WIDTH:
+            val = True
+        inst['Properties']['atomic'] = val

@@ -137,6 +137,9 @@ def parse(packages):
                 f['Parent'] = RefDict(pkg)
                 parse_file(f, pkg, packages)
 
+    packages.resolve_argument_lists()
+    packages.check()
+
 
 def parse_file(this_file, this_pkg, packages):
     if 'Symbols' not in this_pkg:
@@ -184,7 +187,7 @@ def parse_file(this_file, this_pkg, packages):
             break
 
 
-def parse_argument_list(parser):
+def parse_argument_list(parser, symbol):
     args = []
 
     names = []
@@ -196,7 +199,7 @@ def parse_argument_list(parser):
         if node.type == 'identifier':
             name = parser.get_node_string(node)
         else:
-            val = expr.build_expression(parser, node)
+            val = expr.build_expression(parser, node, symbol)
 
         if parser.node.children[i + 1].type in [',', ')']:
             if name and name in names:
@@ -246,7 +249,7 @@ def parse_element_anonymous_instantiation(parser):
 
     if parser.node.children[-1].type == 'element_body':
         properties, symbols = parse_element_body(
-            ParserFromNode(parser, parser.node.children[-1])
+            ParserFromNode(parser, parser.node.children[-1]), symbol
         )
         if properties:
             symbol['Properties'] = properties
@@ -265,14 +268,14 @@ def parse_element_anonymous_instantiation(parser):
     return [(name, symbol)]
 
 
-def parse_element_body(parser):
+def parse_element_body(parser, symbol):
     properties = {}
     symbols = {}
 
     for node in parser.node.children:
         if node.type == 'property_assignment':
             name, value, line_number = parse_propery_assignment(
-                ParserFromNode(parser, node)
+                ParserFromNode(parser, node), symbol
             )
 
             if name in properties:
@@ -318,7 +321,7 @@ def parse_element_type_definition(parser):
     for node in parser.node.children[2:]:
         if node.type == 'parameter_list':
             symbol['Parameters'] = parse_parameter_list(
-                ParserFromNode(parser, node)
+                ParserFromNode(parser, node), symbol
             )
         elif node.type in ['identifier', 'qualified_identifier']:
             symbol['Type'] = parser.get_node_string(node)
@@ -329,7 +332,7 @@ def parse_element_type_definition(parser):
             )
         elif node.type == 'element_body':
             properties, symbols = parse_element_body(
-                ParserFromNode(parser, parser.node.children[-1])
+                ParserFromNode(parser, parser.node.children[-1]), symbol
             )
             if properties:
                 symbol['Properties'] = properties
@@ -365,7 +368,7 @@ def parse_element_definitive_instantiation(parser):
 
     if parser.node.children[-1].type == 'argument_list':
         symbol['Arguments'] = parse_argument_list(
-            ParserFromNode(parser, parser.node.children[-1])
+            ParserFromNode(parser, parser.node.children[-1]), symbol
         )
 
     if name in ValidElements.keys():
@@ -388,7 +391,7 @@ def parse_multi_constant_definition(parser):
         }
         name = parser.get_node_string(parser.node.children[i * 3 + 1])
 
-        expression = expr.build_expression(parser, parser.node.children[i * 3 + 3])
+        expression = expr.build_expression(parser, parser.node.children[i * 3 + 3], symbol)
         symbol['Value'] = expression
 
         symbols.append((name, symbol))
@@ -396,7 +399,7 @@ def parse_multi_constant_definition(parser):
     return symbols
 
 
-def parse_parameter_list(parser):
+def parse_parameter_list(parser, symbol):
     params = []
 
     name = None
@@ -409,7 +412,7 @@ def parse_parameter_list(parser):
         if node.type == 'identifier':
             name = parser.get_node_string(node)
         else:
-            default_value = expr.build_expression(parser, node)
+            default_value = expr.build_expression(parser, node, symbol)
 
         if parser.node.children[i + 1].type in [',', ')']:
             for p in params:
@@ -439,9 +442,9 @@ def parse_parameter_list(parser):
     return tuple(params)
 
 
-def parse_propery_assignment(parser):
+def parse_propery_assignment(parser, symbol):
     name = parser.get_node_string(parser.node.children[0])
-    value = expr.build_expression(parser, parser.node.children[2])
+    value = expr.build_expression(parser, parser.node.children[2], symbol)
     line_number = parser.node.start_point[0] + 1
 
     return name, value, line_number
@@ -454,7 +457,7 @@ def parse_single_constant_definition(parser):
     }
     name = parser.get_node_string(parser.node.children[1])
 
-    expression = expr.build_expression(parser, parser.node.children[3])
+    expression = expr.build_expression(parser, parser.node.children[3], symbol)
     symbol['Value'] = expression
 
     return [(name, symbol)]

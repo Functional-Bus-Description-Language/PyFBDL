@@ -9,15 +9,18 @@ from pprint import pprint
 
 this_module = sys.modules[__name__]
 
+from .packages import Packages
 
 class ExprDict(dict):
-    def __init__(self, parser, node):
+    def __init__(self, parser, node, symbol):
         super().__init__()
         self.parser = parser
+        self.symbol = symbol
         self._value = None
 
         self['String'] = parser.get_node_string(node)
         self['Kind'] = node.type
+        self['Parent'] = symbol.get('Id')
 
     @property
     def value(self):
@@ -67,13 +70,15 @@ class ExprDict(dict):
             return left >> right
 
     def evaluate_identifier(self):
-        pkg_symbols = self.parser.this_pkg['Symbols']
-        if not self['String'] in pkg_symbols:
-            raise Exception(
-                f"Can't find symbol '{self['String']}' in package '{self.parser.this_pkg['Path']}'."
-            )
+#        pkg_symbols = self.parser.this_pkg['Symbols']
+        sym = Packages.get_symbol(self['String'], self.symbol)
 
-        return pkg_symbols[self['String']]['Value'].value
+#        if not self['String'] in pkg_symbols:
+#            raise Exception(
+#                f"Can't find symbol '{self['String']}' in package '{self.parser.this_pkg['Path']}'."
+#            )
+#
+        return sym.value
 
     def evaluate_qualified_identifier(self):
         pkg_name = self['Package']
@@ -90,7 +95,7 @@ class ExprDict(dict):
         return symbols[self['Identifier']]['Value'].value
 
 
-def build_binary_operation(parser, node):
+def build_binary_operation(parser, node,):
     bo = ExprDict(parser, node)
 
     left_child = node.children[0]
@@ -110,51 +115,51 @@ def build_binary_literal(parser, node):
     return bl
 
 
-def build_decimal_literal(parser, node):
-    dl = ExprDict(parser, node)
+def build_decimal_literal(parser, node, symbol):
+    dl = ExprDict(parser, node, symbol)
     dl.value = int(dl['String'])
 
     return dl
 
 
-def build_expression(parser, node):
-    e = ExprDict(parser, node)
+def build_expression(parser, node, symbol):
+    e = ExprDict(parser, node, symbol)
 
     child_node = node.children[0]
-    e['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node)
+    e['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node, symbol)
 
     return e
 
 
-def build_false(parser, node):
-    f = ExprDict(parser, node)
+def build_false(parser, node, symbol):
+    f = ExprDict(parser, node, symbol)
     f.value = False
 
     return f
 
 
-def build_hex_literal(parser, node):
-    hl = ExprDict(parser, node)
+def build_hex_literal(parser, node, symbol):
+    hl = ExprDict(parser, node, symbol)
     hl.value = int(hl['String'], base=16)
 
     return hl
 
 
-def build_identifier(parser, node):
-    i = ExprDict(parser, node)
+def build_identifier(parser, node, symbol):
+    i = ExprDict(parser, node, symbol)
 
     return i
 
 
-def build_octal_literal(parser, node):
-    ol = ExprDict(parser, node)
+def build_octal_literal(parser, node, symbol):
+    ol = ExprDict(parser, node, symbol)
     ol.value = int(ol['String'], base=8)
 
     return ol
 
 
-def build_parenthesized_expression(parser, node):
-    pe = ExprDict(parser, node)
+def build_parenthesized_expression(parser, node, symbol):
+    pe = ExprDict(parser, node, symbol)
 
     child_node = node.children[1]
     pe['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node)
@@ -162,8 +167,8 @@ def build_parenthesized_expression(parser, node):
     return pe
 
 
-def build_primary_expression(parser, node):
-    pe = ExprDict(parser, node)
+def build_primary_expression(parser, node, symbol):
+    pe = ExprDict(parser, node, symbol)
 
     child_node = node.children[0]
     pe['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node)
@@ -171,15 +176,15 @@ def build_primary_expression(parser, node):
     return pe
 
 
-def build_true(parser, node):
-    t = ExprDict(parser, node)
+def build_true(parser, node, symbol):
+    t = ExprDict(parser, node, symbol)
     t.value = True
 
     return t
 
 
-def build_qualified_identifier(parser, node):
-    qi = ExprDict(parser, node)
+def build_qualified_identifier(parser, node, symbol):
+    qi = ExprDict(parser, node, symbol)
     qi['Package'], qi['Identifier'] = qi['String'].split('.')
 
     if not qi['Identifier'][0].isupper():

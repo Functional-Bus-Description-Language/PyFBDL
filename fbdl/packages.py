@@ -1,11 +1,11 @@
 """
 Module for packages dictionary.
 """
+import copy
 import logging as log
-from pprint import pformat
+from pprint import pformat, pprint
 import networkx as nx
 
-from .expr import ExprDict
 from .refdict import RefDict
 from .validation import ValidElements
 
@@ -21,6 +21,74 @@ class Packages(dict):
         if name.startswith('fbd-'):
             name = name[4:]
         return name
+
+    def resolve_argument_list(self, symbol, parameter_list):
+        args = symbol.get('Arguments', ())
+
+        resolved_arguments = {}
+
+        in_positional_arguments = True
+        for i, p in enumerate(parameter_list):
+            if in_positional_arguments:
+                if i < len(args):
+                    arg_name = args[i].get('Name')
+                else:
+                    in_positional_arguments = False
+                    arg_name = None
+
+                if arg_name:
+                    in_positional_arguments = False
+                    if arg_name == p['Name']:
+                        resolved_arguments[p['Name']] = copy.copy(args[i]['Value'])
+                    else:
+                        for a in args:
+                            if a['Name'] == p['Name']:
+                                resolved_arguments[p['Name']] = copy.copy(a['Value'])
+                                break
+                        else:
+                            resolved_arguments[p['Name']] = copy.copy(p['Default Value'])
+                else:
+                    if i < len(args):
+                        resolved_arguments[p['Name']] = copy.copy(args[i]['Value'])
+                    else:
+                        resolved_arguments[p['Name']] = copy.copy(p['Default Value'])
+            else:
+                for a in args:
+                    if a['Name'] == p['Name']:
+                        resolved_arguments[p['Name']] = copy.copy(a['Value'])
+                        break
+                else:
+                    resolved_arguments[p['Name']] = copy.copy(p['Default Value'])
+
+#        for _, r in resolved_arguments.items():
+#            pprint(r.symbol)
+#            r.symbol = symbol
+#            pprint(r.symbol)
+
+        return resolved_arguments
+
+    def resolve_argument_lists_in_symbols(self, symbols):
+        for name, symbol in symbols.items():
+            if symbol['Kind'] not in [
+                'Element Anonymous Instantiation',
+                'Element Definitive Instantiation',
+                'Element Type Definition',
+            ]:
+                continue
+
+            # Base elements can not have parameter list.
+            if symbol['Type'] not in ValidElements:
+                param_list = self.get_symbol(symbol['Type'], symbol).get('Parameters')
+                if param_list:
+                    symbol['Resolved Arguments'] = self.resolve_argument_list(symbol, param_list)
+
+            if 'Symbols' in symbol:
+                self.resolve_argument_lists_in_symbols(symbol['Symbols'])
+
+    def resolve_argument_lists(self):
+        for _, pkgs in self.items():
+            for pkg in pkgs:
+                self.resolve_argument_lists_in_symbols(pkg['Symbols'])
 
     @staticmethod
     def _get_symbol_foreign_pkg(symbol, start_node):
@@ -61,6 +129,8 @@ class Packages(dict):
         """Get reference to the symbol. Start searching from given start_node."""
         node = start_node
 
+        log.debug(f"Looking for symbol '{symbol}', starting from node '{node['Id']}'.")
+
         if '.' in symbol:
             return self._get_symbol_foreign_pkg(symbol, node)
 
@@ -68,6 +138,10 @@ class Packages(dict):
             if node.get('Symbols'):
                 if symbol in node['Symbols']:
                     return node['Symbols'][symbol]
+
+            if node.get('Resolved Arguments'):
+                if symbol in node['Resolved Arguments']:
+                    return node['Resolved Arguments'][symbol]
 
             if node['Kind'] == 'Package':
                 raise Exception(
@@ -148,6 +222,7 @@ class Packages(dict):
         return [self.get_ref_to_pkg(p) for p in paths]
 
     def _get_expressions(self, node):
+        from .expr import ExprDict
         expressions = []
 
         type_ = type(node)
