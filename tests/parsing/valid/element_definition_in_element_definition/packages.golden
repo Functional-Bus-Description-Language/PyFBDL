@@ -3,21 +3,23 @@
                       'Kind': 'File',
                       'Parent': RD to '0x1001',
                       'Path': 'bus.fbd',
-                      'Symbols': {'my_bus': {'Id': '0x1003',
+                      'Symbols': {'my_bus': {'Id': '0x1002',
                                              'Kind': 'Element Type Definition',
                                              'Line Number': 1,
                                              'Parameters': ({'Name': 'm'},),
+                                             'Parent': RD to '0x1000',
                                              'Properties': {'masters': {'Line Number': 2,
                                                                         'Value': {'Child': {'Kind': 'identifier',
                                                                                             'String': 'm'},
                                                                                   'Kind': 'primary_expression',
                                                                                   'String': 'm'}}},
-                                             'Symbols': {'my_mask': {'Id': '0x1002',
+                                             'Symbols': {'my_mask': {'Id': '0x1004',
                                                                      'Kind': 'Element '
                                                                              'Type '
                                                                              'Definition',
                                                                      'Line Number': 4,
                                                                      'Parameters': ({'Name': 'w'},),
+                                                                     'Parent': {},
                                                                      'Properties': {'width': {'Line Number': 5,
                                                                                               'Value': {'Child': {'Kind': 'identifier',
                                                                                                                   'String': 'w'},
@@ -28,4 +30,4 @@
            'Id': '0x1001',
            'Kind': 'Package',
            'Path': '/home/mkru/workspace/FBDL/PyFBDL/tests/parsing/valid/element_definition_in_element_definition/bus.fbd',
-           'Symbols': {'my_bus': RD to '0x1003'}}]}
+           'Symbols': {'my_bus': RD to '0x1002'}}]}

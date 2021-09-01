@@ -27,6 +27,10 @@ def set_bus_width():
 def instantiate(after_parse_packages):
     global packages
     packages = after_parse_packages
+
+    if 'main' not in packages['main'][0]['Symbols']:
+        return {}
+
     set_bus_width()
 
     resolve_argument_lists()
@@ -81,6 +85,9 @@ def resolve_argument_list(symbol, parameter_list):
 
 def resolve_argument_lists_in_symbols(symbols):
     for name, symbol in symbols.items():
+        if symbol['Kind'] not in ['Element Definitive Instantiation', 'Element Type Definition']:
+            continue
+
         # Base elements can not have parameter list.
         if symbol['Type'] in ValidElements:
             continue
