@@ -166,8 +166,6 @@ def parse_file(this_file, this_pkg, packages):
             pass
         else:
             for name, symbol in getattr(this_module, 'parse_' + node_type)(parser):
-                if 'Id' not in symbol:
-                    symbol['Id'] = idgen.generate()
                 if name in this_file['Symbols']:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice in file '{this_file['Path']}'.\n"
@@ -234,10 +232,10 @@ def parse_argument_list(parser, symbol):
 def parse_element_anonymous_instantiation(parser):
     name = parser.get_node_string(parser.node.children[0])
     symbol = {
+        'Id': idgen.generate(),
         'Kind': 'Element Anonymous Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
     }
-    symbol['Id'] = idgen.generate()
 
     if parser.node.children[1].type == '[':
         symbol['Number'] = expr.build_expression(parser, parser.node.children[2])
@@ -295,7 +293,6 @@ def parse_element_body(parser, symbol):
             for name, symbol in getattr(this_module, 'parse_' + node.type)(
                 ParserFromNode(parser, node)
             ):
-                symbol['Id'] = idgen.generate()
                 if name and name in symbols:
                     raise Exception(
                         f"Symbol '{name}' defined at least twice within the same element body.\n"
@@ -311,11 +308,10 @@ def parse_element_body(parser, symbol):
 def parse_element_type_definition(parser):
     name = parser.get_node_string(parser.node.children[1])
     symbol = {
+        'Id': idgen.generate(),
         'Kind': 'Element Type Definition',
         'Line Number': parser.node.start_point[0] + 1,
     }
-    # 'Id' must be assigned here, because 'Parent' has to be set for children nodes.
-    symbol['Id'] = idgen.generate()
 
     type_node = None
     for node in parser.node.children[2:]:
@@ -354,6 +350,7 @@ def parse_element_type_definition(parser):
 def parse_element_definitive_instantiation(parser):
     name = parser.get_node_string(parser.node.children[0])
     symbol = {
+        'Id': idgen.generate(),
         'Kind': 'Element Definitive Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
     }
@@ -386,6 +383,7 @@ def parse_multi_constant_definition(parser):
 
     for i in range(len(parser.node.children) // 3):
         symbol = {
+            'Id': idgen.generate(),
             'Kind': 'Constant',
             'Line Number': parser.node.children[i * 3 + 1].start_point[0] + 1
         }
@@ -452,6 +450,7 @@ def parse_propery_assignment(parser, symbol):
 
 def parse_single_constant_definition(parser):
     symbol = {
+        'Id': idgen.generate(),
         'Kind': 'Constant',
         'Line Number': parser.node.children[1].start_point[0] + 1
     }
