@@ -62,11 +62,6 @@ class Packages(dict):
                 else:
                     resolved_arguments[p['Name']] = copy.copy(p['Default Value'])
 
-        #        for _, r in resolved_arguments.items():
-        #            pprint(r.symbol)
-        #            r.symbol = symbol
-        #            pprint(r.symbol)
-
         return resolved_arguments
 
     def resolve_argument_lists_in_symbols(self, symbols):

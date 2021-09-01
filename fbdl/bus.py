@@ -113,10 +113,9 @@ def instantiate_element(element):
     type_chain = resolve_to_base_type(element)
     type_instance = instantiate_type_chain(type_chain)
 
+    # TODO: Instantiate also own body.
+
     return type_instance
-
-
-#    return getattr(this_module, 'instantiate_' + element['Type'])(element, packages)
 
 
 def fill_missing_properties(inst):
