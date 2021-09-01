@@ -22,13 +22,13 @@ class Packages(dict):
             name = name[4:]
         return name
 
-    def resolve_argument_list(self, symbol, parameter_list):
+    def resolve_arguments(self, symbol, parameters):
         args = symbol.get('Arguments', ())
 
         resolved_arguments = {}
 
         in_positional_arguments = True
-        for i, p in enumerate(parameter_list):
+        for i, p in enumerate(parameters):
             if in_positional_arguments:
                 if i < len(args):
                     arg_name = args[i].get('Name')
@@ -80,10 +80,10 @@ class Packages(dict):
 
             # Base elements can not have parameter list.
             if symbol['Type'] not in ValidElements:
-                param_list = self.get_symbol(symbol['Type'], symbol).get('Parameters')
-                if param_list:
-                    symbol['Resolved Arguments'] = self.resolve_argument_list(
-                        symbol, param_list
+                params = self.get_symbol(symbol['Type'], symbol).get('Parameters')
+                if params:
+                    symbol['Resolved Arguments'] = self.resolve_arguments(
+                        symbol, params
                     )
 
             if 'Symbols' in symbol:
