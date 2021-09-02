@@ -168,21 +168,21 @@ def parse_file(this_file, this_pkg, packages):
         elif node_type == 'comment':
             pass
         else:
-            for name, symbol in getattr(this_module, 'parse_' + node_type)(parser):
-                if name in this_file['Symbols']:
+            for symbol in getattr(this_module, 'parse_' + node_type)(parser):
+                if symbol['Name'] in this_file['Symbols']:
                     raise Exception(
-                        f"Symbol '{name}' defined at least twice in file '{this_file['Path']}'.\n"
-                        + f"First occurrence line {this_file['Symbols'][name]['Line Number']}, second line {symbol['Line Number']}."
+                        f"Symbol '{symbol['Name']}' defined at least twice in file '{this_file['Path']}'.\n"
+                        + f"First occurrence line {this_file['Symbols'][symbol['Name']]['Line Number']}, second line {symbol['Line Number']}."
                     )
                 symbol['Parent'] = RefDict(this_file)
-                this_file['Symbols'][name] = symbol
+                this_file['Symbols'][symbol['Name']] = symbol
 
-                if name and name in this_pkg['Symbols']:
+                if symbol['Name'] in this_pkg['Symbols']:
                     raise Exception(
-                        f"Symbol '{name}' defined at least twice in package '{this_pkg['Path']}'."
+                        f"Symbol '{symbol['Name']}' defined at least twice in package '{this_pkg['Path']}'."
                     )
 
-                this_pkg['Symbols'][name] = RefDict(symbol)
+                this_pkg['Symbols'][symbol['Name']] = RefDict(symbol)
 
         if not parser.goto_next_sibling():
             break
@@ -233,11 +233,11 @@ def parse_argument_list(parser, symbol):
 
 
 def parse_element_anonymous_instantiation(parser):
-    name = parser.get_node_string(parser.node.children[0])
     symbol = {
         'Id': idgen.generate(),
         'Kind': 'Element Anonymous Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
+        'Name': parser.get_node_string(parser.node.children[0])
     }
 
     if parser.node.children[1].type == '[':
@@ -259,13 +259,13 @@ def parse_element_anonymous_instantiation(parser):
                 sym['Parent'] = RefDict(symbol)
             symbol['Symbols'] = symbols
 
-    if name in ValidElements.keys():
+    if symbol['Name'] in ValidElements.keys():
         raise Exception(
-            f"Invalid instance name '{name}'.\n"
+            f"Invalid instance name '{symbol['Name']}'.\n"
             + "Element instance can not have the same name as base type.\n"
             + parser.file_line_msg(parser.node)
         )
-    return [(name, symbol)]
+    return [symbol]
 
 
 def parse_element_body(parser, symbol):
@@ -292,27 +292,27 @@ def parse_element_body(parser, symbol):
             'single_constant_definition',
             'multi_constant_definition',
         ]:
-            for name, symbol in getattr(this_module, 'parse_' + node.type)(
+            for symbol in getattr(this_module, 'parse_' + node.type)(
                 ParserFromNode(parser, node)
             ):
-                if name and name in symbols:
+                if symbol['Name'] in symbols:
                     raise Exception(
-                        f"Symbol '{name}' defined at least twice within the same element body.\n"
+                        f"Symbol '{symbol['Name']}' defined at least twice within the same element body.\n"
                         + f"File '{parser.this_file['Path']}'.\n"
-                        + f"First occurrence line {symbols[name]['Line Number']}, second line {symbol['Line Number']}."
+                        + f"First occurrence line {symbols[symbol['Name']]['Line Number']}, second line {symbol['Line Number']}."
                     )
-                elif name:
-                    symbols[name] = symbol
+                elif symbol['Name']:
+                    symbols[symbol['Name']] = symbol
 
     return properties, symbols
 
 
 def parse_element_type_definition(parser):
-    name = parser.get_node_string(parser.node.children[1])
     symbol = {
         'Id': idgen.generate(),
         'Kind': 'Element Type Definition',
         'Line Number': parser.node.start_point[0] + 1,
+        'Name': parser.get_node_string(parser.node.children[1])
     }
 
     type_node = None
@@ -346,15 +346,15 @@ def parse_element_type_definition(parser):
                 + parser.file_line_msg(type_node)
             )
 
-    return [(name, symbol)]
+    return [symbol]
 
 
 def parse_element_definitive_instantiation(parser):
-    name = parser.get_node_string(parser.node.children[0])
     symbol = {
         'Id': idgen.generate(),
         'Kind': 'Element Definitive Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
+        'Name': parser.get_node_string(parser.node.children[0])
     }
 
     if parser.node.children[1].type == '[':
@@ -370,14 +370,14 @@ def parse_element_definitive_instantiation(parser):
             ParserFromNode(parser, parser.node.children[-1]), symbol
         )
 
-    if name in ValidElements.keys():
+    if symbol['Name'] in ValidElements.keys():
         raise Exception(
-            f"Invalid instance name '{name}'.\n"
+            f"Invalid instance name '{symbol['Name']}'.\n"
             + "Element instance can not have the same name as base type.\n"
             + parser.file_line_msg(parser.node)
         )
 
-    return [(name, symbol)]
+    return [symbol]
 
 
 def parse_multi_constant_definition(parser):
@@ -388,15 +388,15 @@ def parse_multi_constant_definition(parser):
             'Id': idgen.generate(),
             'Kind': 'Constant',
             'Line Number': parser.node.children[i * 3 + 1].start_point[0] + 1,
+            'Name': parser.get_node_string(parser.node.children[i * 3 + 1])
         }
-        name = parser.get_node_string(parser.node.children[i * 3 + 1])
 
         expression = expr.build_expression(
             parser, parser.node.children[i * 3 + 3], symbol
         )
         symbol['Value'] = expression
 
-        symbols.append((name, symbol))
+        symbols.append(symbol)
 
     return symbols
 
@@ -457,13 +457,13 @@ def parse_single_constant_definition(parser):
         'Id': idgen.generate(),
         'Kind': 'Constant',
         'Line Number': parser.node.children[1].start_point[0] + 1,
+        'Name': parser.get_node_string(parser.node.children[1])
     }
-    name = parser.get_node_string(parser.node.children[1])
 
     expression = expr.build_expression(parser, parser.node.children[3], symbol)
     symbol['Value'] = expression
 
-    return [(name, symbol)]
+    return [symbol]
 
 
 def parse_single_import_statement(parser):

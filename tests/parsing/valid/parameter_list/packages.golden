@@ -7,6 +7,7 @@
                                                 'Kind': 'Element Type '
                                                         'Definition',
                                                 'Line Number': 5,
+                                                'Name': 'my_config',
                                                 'Parameters': ({'Default Value': {'Child': {'Kind': 'decimal_literal',
                                                                                             'String': '10',
                                                                                             'Value': 10},
@@ -23,6 +24,7 @@
                                   'my_mask': {'Id': '0x1002',
                                               'Kind': 'Element Type Definition',
                                               'Line Number': 1,
+                                              'Name': 'my_mask',
                                               'Parameters': ({'Name': 'A'},
                                                              {'Name': 'B'}),
                                               'Parent': RD to '0x1000',
@@ -41,6 +43,7 @@
                                                 'Kind': 'Element Type '
                                                         'Definition',
                                                 'Line Number': 8,
+                                                'Name': 'my_status',
                                                 'Parameters': ({'Name': 'a'},
                                                                {'Default Value': {'Child': {'Kind': 'false',
                                                                                             'String': 'false',

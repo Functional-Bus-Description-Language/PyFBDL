@@ -6,6 +6,7 @@
                       'Symbols': {'my_mask': {'Id': '0x1002',
                                               'Kind': 'Element Type Definition',
                                               'Line Number': 1,
+                                              'Name': 'my_mask',
                                               'Parameters': ({'Name': 'FOO'},
                                                              {'Default Value': {'Child': {'Kind': 'decimal_literal',
                                                                                           'String': '2',

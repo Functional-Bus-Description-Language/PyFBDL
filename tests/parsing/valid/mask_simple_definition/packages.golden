@@ -6,6 +6,7 @@
                       'Symbols': {'my_mask': {'Id': '0x1002',
                                               'Kind': 'Element Type Definition',
                                               'Line Number': 1,
+                                              'Name': 'my_mask',
                                               'Parent': RD to '0x1000',
                                               'Properties': {'width': {'Line Number': 2,
                                                                        'Value': {'Child': {'Kind': 'decimal_literal',

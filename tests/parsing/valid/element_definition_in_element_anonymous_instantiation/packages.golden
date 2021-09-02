@@ -7,10 +7,12 @@
                                            'Kind': 'Element Anonymous '
                                                    'Instantiation',
                                            'Line Number': 1,
+                                           'Name': 'main',
                                            'Parent': RD to '0x1000',
                                            'Symbols': {'A': {'Id': '0x1003',
                                                              'Kind': 'Constant',
                                                              'Line Number': 2,
+                                                             'Name': 'A',
                                                              'Parent': {},
                                                              'Value': {'Child': {'Kind': 'decimal_literal',
                                                                                  'String': '5',
@@ -22,6 +24,7 @@
                                                                            'Type '
                                                                            'Definition',
                                                                    'Line Number': 4,
+                                                                   'Name': 'my_mask',
                                                                    'Parent': {},
                                                                    'Properties': {'width': {'Line Number': 5,
                                                                                             'Value': {'Child': {'Kind': 'identifier',

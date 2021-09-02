@@ -6,6 +6,7 @@
                       'Symbols': {'my_bus': {'Id': '0x1002',
                                              'Kind': 'Element Type Definition',
                                              'Line Number': 1,
+                                             'Name': 'my_bus',
                                              'Parameters': ({'Name': 'm'},),
                                              'Parent': RD to '0x1000',
                                              'Properties': {'masters': {'Line Number': 2,
@@ -18,6 +19,7 @@
                                                                              'Type '
                                                                              'Definition',
                                                                      'Line Number': 4,
+                                                                     'Name': 'my_mask',
                                                                      'Parameters': ({'Name': 'w'},),
                                                                      'Parent': {},
                                                                      'Properties': {'width': {'Line Number': 5,
