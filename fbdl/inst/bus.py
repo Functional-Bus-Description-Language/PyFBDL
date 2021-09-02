@@ -72,13 +72,13 @@ def instantiate_type(type, from_type, resolved_arguments):
                     elem['Base Type']
                     not in ValidElements[inst['Base Type']]['Valid Elements']
                 ):
-                    raise Exception("Invalid Element.")
+                    raise Exception("TODO: Invalid Element.")
 
                 if 'Elements' not in inst:
                     inst['Elements'] = {}
                 if name in inst['Elements']:
-                    raise Exception("Can not override element.")
-                inst['Elements'][name] = instantiate_element(symbol)
+                    raise Exception("TODO: Can not override element.")
+                inst['Elements'][name] = elem
 
     return inst
 
@@ -97,6 +97,7 @@ def instantiate_type_chain(type_chain):
 
 
 def instantiate_element(element):
+    log.debug(f"Instantiating element '{element['Name']}'.")
     type_chain = resolve_to_base_type(element)
     type_instance = instantiate_type_chain(type_chain)
 
