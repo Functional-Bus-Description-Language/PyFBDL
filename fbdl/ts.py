@@ -365,10 +365,26 @@ def parse_element_definitive_instantiation(parser):
     else:
         symbol['Type'] = parser.get_node_string(parser.node.children[4])
 
+    if parser.node.children[-2].type == 'argument_list':
+        symbol['Arguments'] = parse_argument_list(
+            ParserFromNode(parser, parser.node.children[-2]), symbol
+        )
+
     if parser.node.children[-1].type == 'argument_list':
         symbol['Arguments'] = parse_argument_list(
             ParserFromNode(parser, parser.node.children[-1]), symbol
         )
+
+    if parser.node.children[-1].type == 'element_body':
+        properties, symbols = parse_element_body(
+            ParserFromNode(parser, parser.node.children[-1]), symbol
+        )
+        if properties:
+            symbol['Properties'] = properties
+        if symbols:
+            for _, sym in symbols.items():
+                sym['Parent'] = RefDict(symbol)
+            symbol['Symbols'] = symbols
 
     if symbol['Name'] in ValidElements.keys():
         raise Exception(

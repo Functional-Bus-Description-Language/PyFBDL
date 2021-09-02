@@ -1,0 +1,6 @@
+type foo_mask mask
+	width = 1
+
+main bus
+	my_mask foo_mask
+		width = 2

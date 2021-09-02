@@ -77,8 +77,8 @@ def instantiate_type(type, from_type, resolved_arguments):
             if name in inst['Properties']:
                 raise Exception(
                     f"{type['Kind']}, can not set property '{name}' in symbol '{type['Name']}'.\n"
-                    + "The property is alrady set in one of the ancestor type.\n"
-                    + f"File '{get_file_path(type)}' + line {p['Line Number']}."
+                    + "The property is alrady set in one of the ancestor types.\n"
+                    + f"File '{get_file_path(type)}', line {p['Line Number']}."
                 )
 
             inst['Properties'][name] = p['Value'].value
