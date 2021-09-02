@@ -99,8 +99,6 @@ def instantiate_type_chain(type_chain):
 def instantiate_element(element):
     log.debug(f"Instantiating element '{element['Name']}'.")
     type_chain = resolve_to_base_type(element)
-    type_instance = instantiate_type_chain(type_chain)
+    instance = instantiate_type_chain(type_chain)
 
-    # TODO: Instantiate also own body.
-
-    return type_instance
+    return instance
