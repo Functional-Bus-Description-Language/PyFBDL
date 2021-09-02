@@ -11,6 +11,7 @@ this_module = sys.modules[__name__]
 
 from .packages import Packages
 
+
 class ExprDict(dict):
     def __init__(self, parser, node, symbol):
         super().__init__()
@@ -23,9 +24,12 @@ class ExprDict(dict):
 
     @property
     def value(self):
+        # Below cache mechanism had to be removed.
+        # This is because it breaks current mechanism
+        # of parametrized type instantiation.
         # If already evaluated return.
-        if self._value:
-            return self._value
+        # if self._value:
+        #    return self._value
 
         kind = self['Kind']
         log.debug(f"Evaluating {kind}: '{self['String']}'")
@@ -68,15 +72,12 @@ class ExprDict(dict):
         elif operator == '>>':
             return left >> right
 
+    def evaluate_decimal_literal(self):
+        return self._value
+
     def evaluate_identifier(self):
-#        pkg_symbols = self.parser.this_pkg['Symbols']
         sym = Packages.get_symbol(self['String'], self.symbol)
 
-#        if not self['String'] in pkg_symbols:
-#            raise Exception(
-#                f"Can't find symbol '{self['String']}' in package '{self.parser.this_pkg['Path']}'."
-#            )
-#
         return sym.value
 
     def evaluate_qualified_identifier(self):
@@ -94,7 +95,7 @@ class ExprDict(dict):
         return symbols[self['Identifier']]['Value'].value
 
 
-def build_binary_operation(parser, node,):
+def build_binary_operation(parser, node):
     bo = ExprDict(parser, node)
 
     left_child = node.children[0]
@@ -125,7 +126,9 @@ def build_expression(parser, node, symbol):
     e = ExprDict(parser, node, symbol)
 
     child_node = node.children[0]
-    e['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node, symbol)
+    e['Child'] = getattr(this_module, 'build_' + child_node.type)(
+        parser, child_node, symbol
+    )
 
     return e
 
