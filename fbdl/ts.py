@@ -241,7 +241,7 @@ def parse_element_anonymous_instantiation(parser):
     }
 
     if parser.node.children[1].type == '[':
-        symbol['Number'] = expr.build_expression(parser, parser.node.children[2], symbol)
+        symbol['Count'] = expr.build_expression(parser, parser.node.children[2], symbol)
 
     if parser.node.children[1].type == 'element_type':
         symbol['Type'] = parser.get_node_string(parser.node.children[1])
@@ -358,7 +358,7 @@ def parse_element_definitive_instantiation(parser):
     }
 
     if parser.node.children[1].type == '[':
-        symbol['Number'] = expr.build_expression(parser, parser.node.children[2])
+        symbol['Count'] = expr.build_expression(parser, parser.node.children[2], symbol)
 
     if parser.node.children[1].type == 'identifier':
         symbol['Type'] = parser.get_node_string(parser.node.children[1])

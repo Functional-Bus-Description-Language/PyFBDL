@@ -127,9 +127,9 @@ def instantiate_type_chain(type_chain):
 
     inst.pop('Previous Type')
 
-    number = type_chain[-1].get('Number')
-    if number:
-        inst['Number'] = number.value
+    count = type_chain[-1].get('Count')
+    if count:
+        inst['Count'] = count.value
 
     fill_missing_properties(inst)
 
