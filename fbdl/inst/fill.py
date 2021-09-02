@@ -60,6 +60,9 @@ def fill_missing_properties_bus(inst):
     if 'masters' not in inst['Properties']:
         inst['Properties']['masters'] = 1
 
+    if 'width' not in inst['Properties']:
+        inst['Properties']['width'] = BUS_WIDTH
+
 
 def fill_missing_properties_mask(inst):
     if 'width' not in inst['Properties']:
