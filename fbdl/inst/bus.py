@@ -1,6 +1,7 @@
 import logging as log
 from pprint import pprint
 
+from . import args
 from .fill import set_bus_width, fill_missing_properties
 from ..validation import ValidElements
 
@@ -14,6 +15,8 @@ def instantiate(after_parse_packages):
         return {}
 
     set_bus_width(packages)
+
+    args.resolve_argument_lists(packages)
 
     bus = {'main': instantiate_element(packages['main'][0]['Symbols']['main'])}
 
@@ -34,14 +37,13 @@ def instantiate_type(type, from_type, resolved_arguments):
     if resolved_arguments is not None:
         type['Resolved Arguments'] = resolved_arguments
 
-    #    from_type_type = "None"
-    #    if from_type is not None:
-    #        pprint(from_type)
-    #        from_type_type = from_type['Type']
-    #    log.debug(f"Instantiating type '{type['Type']}' from type '{from_type_type}'.")
+    from_type_type = "None"
+    if from_type is not None:
+        from_type_type = from_type['Previous Type']
+    log.debug(f"Instantiating type '{type['Type']}' from type '{from_type_type}'.")
 
     if from_type == None:
-        inst = {'Base Type': type['Type'], 'Properties': {}}
+        inst = {'Base Type': type['Type'], 'Properties': {}, 'Previous Type': type['Type']}
     else:
         inst = from_type
 
@@ -84,6 +86,7 @@ def instantiate_type_chain(type_chain):
             resolved_arguments = type_chain[i + 1]['Resolved Arguments']
         inst = instantiate_type(t, inst, resolved_arguments)
 
+    inst.pop('Previous Type')
     fill_missing_properties(inst)
     return inst
 

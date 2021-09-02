@@ -137,7 +137,6 @@ def parse(packages):
                 f['Parent'] = RefDict(pkg)
                 parse_file(f, pkg, packages)
 
-    packages.resolve_argument_lists()
     packages.check()
 
 

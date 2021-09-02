@@ -1,7 +1,6 @@
 """
 Module for packages dictionary.
 """
-import copy
 import logging as log
 from pprint import pformat, pprint
 import networkx as nx
@@ -21,73 +20,6 @@ class Packages(dict):
         if name.startswith('fbd-'):
             name = name[4:]
         return name
-
-    def resolve_arguments(self, symbol, parameters):
-        args = symbol.get('Arguments', ())
-
-        resolved_arguments = {}
-
-        in_positional_arguments = True
-        for i, p in enumerate(parameters):
-            if in_positional_arguments:
-                if i < len(args):
-                    arg_name = args[i].get('Name')
-                else:
-                    in_positional_arguments = False
-                    arg_name = None
-
-                if arg_name:
-                    in_positional_arguments = False
-                    if arg_name == p['Name']:
-                        resolved_arguments[p['Name']] = copy.copy(args[i]['Value'])
-                    else:
-                        for a in args:
-                            if a['Name'] == p['Name']:
-                                resolved_arguments[p['Name']] = copy.copy(a['Value'])
-                                break
-                        else:
-                            resolved_arguments[p['Name']] = copy.copy(
-                                p['Default Value']
-                            )
-                else:
-                    if i < len(args):
-                        resolved_arguments[p['Name']] = copy.copy(args[i]['Value'])
-                    else:
-                        resolved_arguments[p['Name']] = copy.copy(p['Default Value'])
-            else:
-                for a in args:
-                    if a['Name'] == p['Name']:
-                        resolved_arguments[p['Name']] = copy.copy(a['Value'])
-                        break
-                else:
-                    resolved_arguments[p['Name']] = copy.copy(p['Default Value'])
-
-        return resolved_arguments
-
-    def resolve_argument_lists_in_symbols(self, symbols):
-        for name, symbol in symbols.items():
-            if symbol['Kind'] not in [
-                'Element Anonymous Instantiation',
-                'Element Definitive Instantiation',
-                'Element Type Definition',
-            ]:
-                continue
-
-            # Base elements can not have parameter list.
-            if symbol['Type'] not in ValidElements:
-                params = self.get_symbol(symbol['Type'], symbol).get('Parameters')
-                if params:
-                    symbol['Resolved Arguments'] = self.resolve_arguments(
-                        symbol, params
-                    )
-
-            if 'Symbols' in symbol:
-                self.resolve_argument_lists_in_symbols(symbol['Symbols'])
-
-    def resolve_argument_lists(self):
-        for _, pkgs in self.items():
-            for pkg in pkgs:
-                self.resolve_argument_lists_in_symbols(pkg['Symbols'])
 
     @staticmethod
     def _get_symbol_foreign_pkg(symbol, start_node):
@@ -124,9 +56,9 @@ class Packages(dict):
             )
 
     @staticmethod
-    def get_symbol(symbol, start_node):
-        """Get reference to the symbol. Start searching from given start_node."""
-        node = start_node
+    def get_symbol(symbol, scope):
+        """Get reference to the symbol. Start searching from given scope."""
+        node = scope
 
         log.debug(f"Looking for symbol '{symbol}', starting from node '{node['Id']}'.")
 
