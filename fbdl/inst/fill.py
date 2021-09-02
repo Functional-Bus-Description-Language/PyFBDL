@@ -28,6 +28,9 @@ def fill_missing_properties(inst):
     return getattr(this_module, 'fill_missing_properties_' + inst['Base Type'])(inst)
 
 
+def fill_missing_properties_block(inst):
+    pass
+
 def fill_missing_properties_config(inst):
     if 'width' not in inst['Properties']:
         inst['Properties']['width'] = DEFAULT_WIDTH
