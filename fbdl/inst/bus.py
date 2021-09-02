@@ -1,31 +1,10 @@
 import logging as log
-import sys
 from pprint import pprint
 
+from .fill import set_bus_width, fill_missing_properties
 from ..validation import ValidElements
 
-this_module = sys.modules[__name__]
-
 packages = None
-
-# Bus width must be easy to read globally, as whether access to an element
-# is atomic or not depends on the bus width.
-DEFAULT_BUS_WIDTH = 32
-BUS_WIDTH = None
-
-
-def set_bus_width():
-    global BUS_WIDTH
-
-    properties = packages['main'][0]['Symbols']['main'].get('Properties')
-    if not properties:
-        BUS_WIDTH = DEFAULT_BUS_WIDTH
-        return
-
-    width = properties.get("width")
-    if not width:
-        BUS_WIDTH = DEFAULT_BUS_WIDTH
-
 
 def instantiate(after_parse_packages):
     global packages
@@ -34,7 +13,7 @@ def instantiate(after_parse_packages):
     if 'main' not in packages['main'][0]['Symbols']:
         return {}
 
-    set_bus_width()
+    set_bus_width(packages)
 
     bus = {'main': instantiate_element(packages['main'][0]['Symbols']['main'])}
 
@@ -116,44 +95,3 @@ def instantiate_element(element):
     # TODO: Instantiate also own body.
 
     return type_instance
-
-
-def fill_missing_properties(inst):
-    return getattr(this_module, 'fill_missing_properties_' + inst['Base Type'])(inst)
-
-
-def fill_missing_properties_config(inst):
-    if 'width' not in inst['Properties']:
-        inst['Properties']['width'] = 32
-    if 'atomic' not in inst['Properties']:
-        val = False
-        if inst['Properties']['width'] > BUS_WIDTH:
-            val = True
-        inst['Properties']['atomic'] = val
-
-
-fill_missing_properties_status = fill_missing_properties_config
-
-
-def fill_missing_properties_param(inst):
-    if 'width' not in inst['Properties']:
-        inst['Properties']['width'] = 32
-
-
-def fill_missing_properties_func(inst):
-    pass
-
-
-def fill_missing_properties_bus(inst):
-    if 'masters' not in inst['Properties']:
-        inst['Properties']['masters'] = 1
-
-
-def fill_missing_properties_mask(inst):
-    if 'width' not in inst['Properties']:
-        inst['Properties']['width'] = 32
-    if 'atomic' not in inst['Properties']:
-        val = False
-        if inst['Properties']['width'] > BUS_WIDTH:
-            val = True
-        inst['Properties']['atomic'] = val
