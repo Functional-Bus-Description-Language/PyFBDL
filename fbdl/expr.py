@@ -20,7 +20,6 @@ class ExprDict(dict):
 
         self['String'] = parser.get_node_string(node)
         self['Kind'] = node.type
-        self['Parent'] = symbol.get('Id')
 
     @property
     def value(self):
