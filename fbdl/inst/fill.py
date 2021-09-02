@@ -22,6 +22,9 @@ def set_bus_width(packages):
     width = properties.get("width")
     if not width:
         BUS_WIDTH = DEFAULT_WIDTH
+        return
+
+    BUS_WIDTH = width['Value'].value
 
 
 def fill_missing_properties(inst):
