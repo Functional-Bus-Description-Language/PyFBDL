@@ -36,7 +36,7 @@ def instantiate(after_parse_packages):
                         continue
 
                     if pkg_name == 'main' and name == 'main':
-                        main_bus = instantiate_element(symbol)
+                        main_bus = {'main': instantiate_element(symbol)}
                     else:
                         instantiate_element(symbol)
 
