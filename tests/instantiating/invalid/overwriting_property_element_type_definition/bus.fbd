@@ -1,0 +1,8 @@
+type foo_mask mask
+	width = 1
+
+type bar_mask foo_mask
+	width = 2
+
+main bus
+	my_mask1 foo_mask

@@ -1,0 +1,3 @@
+Exception: Element Type Definition, can not set property 'width' in symbol 'bar_mask'.
+The property is alrady set in one of the ancestor type.
+File 'bus.fbd' + line 5.

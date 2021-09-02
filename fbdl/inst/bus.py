@@ -3,6 +3,7 @@ from pprint import pprint
 
 from . import args
 from .fill import set_bus_width, fill_missing_properties
+from .utils import get_file_path
 from ..validation import ValidElements
 
 packages = None
@@ -19,9 +20,27 @@ def instantiate(after_parse_packages):
 
     args.resolve_argument_lists(packages)
 
-    bus = {'main': instantiate_element(packages['main'][0]['Symbols']['main'])}
+    main_bus = None
 
-    return bus
+    for pkg_name, pkgs in packages.items():
+        for pkg in pkgs:
+            for name, symbol in pkg['Symbols'].items():
+                if symbol['Kind'] in [
+                    'Element Anonymous Instantiation',
+                    'Element Definitive Instantiation',
+                    'Element Type Definition',
+                ]:
+                    # Do not instantiate basic elements.
+                    # They are already checked during parsing phase.
+                    if name != 'main' and symbol['Type'] in ValidElements.keys():
+                        continue
+
+                    if pkg_name == 'main' and name == 'main':
+                        main_bus = instantiate_element(symbol)
+                    else:
+                        instantiate_element(symbol)
+
+    return main_bus
 
 
 def resolve_to_base_type(symbol):
@@ -56,7 +75,11 @@ def instantiate_type(type, from_type, resolved_arguments):
     if properties:
         for name, p in properties.items():
             if name in inst['Properties']:
-                raise Exception("Can not override properties.")
+                raise Exception(
+                    f"{type['Kind']}, can not set property '{name}' in symbol '{type['Name']}'.\n"
+                    + "The property is alrady set in one of the ancestor type.\n"
+                    + f"File '{get_file_path(type)}' + line {p['Line Number']}."
+                )
 
             inst['Properties'][name] = p['Value'].value
 
