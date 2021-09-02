@@ -105,8 +105,13 @@ def instantiate_type(type, from_type, resolved_arguments):
 
                 if 'Elements' not in inst:
                     inst['Elements'] = {}
+
                 if name in inst['Elements']:
-                    raise Exception("TODO: Can not override element.")
+                    raise Exception(
+                        f"Can not instantiate element '{name}'.\n"
+                        + "Element with such name is already instantiated in one of the ancestor types.\n"
+                        + f"File '{get_file_path(type)}', line {symbol['Line Number']}."
+                    )
                 inst['Elements'][name] = elem
 
     return inst

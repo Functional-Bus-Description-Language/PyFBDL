@@ -1,0 +1,10 @@
+type foo block
+	data config
+		width = 12
+
+type bar foo
+	data config
+		width = 10
+
+main bus
+	my_func bar

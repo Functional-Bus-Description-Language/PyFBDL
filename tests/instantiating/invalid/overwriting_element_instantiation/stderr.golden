@@ -1,0 +1,3 @@
+Exception: Can not instantiate element 'data'.
+Element with such name is already instantiated in one of the ancestor types.
+File 'bus.fbd', line 6.
