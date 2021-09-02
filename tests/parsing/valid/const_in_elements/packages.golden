@@ -26,7 +26,7 @@
                                                                                  'Value': 2},
                                                                        'Kind': 'primary_expression',
                                                                        'String': '2'}},
-                                                       'C': {'Id': '0x100a',
+                                                       'C': {'Id': '0x100A',
                                                              'Kind': 'Constant',
                                                              'Line Number': 14,
                                                              'Parent': {},

@@ -17,7 +17,7 @@
                                                                                  'Value': 5},
                                                                        'Kind': 'primary_expression',
                                                                        'String': '5'}},
-                                                       'my_mask': {'Id': '0x1005',
+                                                       'my_mask': {'Id': '0x1004',
                                                                    'Kind': 'Element '
                                                                            'Type '
                                                                            'Definition',

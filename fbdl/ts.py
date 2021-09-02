@@ -323,7 +323,7 @@ def parse_element_type_definition(parser):
             type_node = node
         elif node.type == 'argument_list':
             symbol['Arguments'] = parse_argument_list(
-                ParserFromNode(parser, node)
+                ParserFromNode(parser, node), symbol
             )
         elif node.type == 'element_body':
             properties, symbols = parse_element_body(
