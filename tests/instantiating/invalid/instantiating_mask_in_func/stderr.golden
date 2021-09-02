@@ -1,0 +1,3 @@
+Exception: Element 'foo', of base type 'mask', can not be instantiated in element 'foo_func' of base type 'func'.
+File 'bus.fbd', line 5.
+Valid inner element types for 'func' are: 'param'.

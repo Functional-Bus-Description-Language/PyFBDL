@@ -1,0 +1,8 @@
+type foo_mask(width=5) mask
+	width = width
+
+type foo_func func
+	foo foo_mask
+
+main bus
+	my_func foo_func

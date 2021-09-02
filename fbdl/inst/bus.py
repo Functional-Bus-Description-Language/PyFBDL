@@ -1,5 +1,5 @@
 import logging as log
-from pprint import pprint
+from pprint import pformat, pprint
 
 from . import args
 from .fill import set_bus_width, fill_missing_properties
@@ -95,7 +95,13 @@ def instantiate_type(type, from_type, resolved_arguments):
                     elem['Base Type']
                     not in ValidElements[inst['Base Type']]['Valid Elements']
                 ):
-                    raise Exception("TODO: Invalid Element.")
+                    raise Exception(
+                        f"Element '{name}', of base type '{elem['Base Type']}', can not be "
+                        + f"instantiated in element '{type['Name']}' of base type '{inst['Base Type']}'.\n"
+                        + f"File '{get_file_path(type)}', line {symbol['Line Number']}.\n"
+                        + f"Valid inner element types for '{inst['Base Type']}' are: "
+                        + f"{pformat(ValidElements[inst['Base Type']]['Valid Elements'])}."
+                    )
 
                 if 'Elements' not in inst:
                     inst['Elements'] = {}
