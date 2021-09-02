@@ -75,6 +75,9 @@ class ExprDict(dict):
     def evaluate_decimal_literal(self):
         return self._value
 
+    def evaluate_false(self):
+        return self._value
+
     def evaluate_identifier(self):
         sym = Packages.get_symbol(self['String'], self.symbol)
 
