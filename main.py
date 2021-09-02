@@ -7,7 +7,7 @@ import sys
 
 from fbdl import pre
 from fbdl import ts
-from fbdl import bus
+from fbdl.inst import bus
 
 VERSION = "0.0.0"
 

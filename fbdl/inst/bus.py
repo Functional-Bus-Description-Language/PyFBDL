@@ -2,7 +2,7 @@ import logging as log
 import sys
 from pprint import pprint
 
-from .validation import ValidElements
+from ..validation import ValidElements
 
 this_module = sys.modules[__name__]
 
