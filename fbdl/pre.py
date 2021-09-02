@@ -111,6 +111,10 @@ def get_indent(line):
 def check_indent(file_):
     current_indent = 0
     for i, line in enumerate(file_):
+        # Ignore empty lines.
+        if line == '\n':
+            continue
+
         indent = get_indent(line)
         if indent is None:
             raise Exception(
@@ -121,7 +125,8 @@ def check_indent(file_):
 
         if indent > current_indent + 1:
             raise Exception(
-                f"Multi indent detected. File '{file_.name}', line number {i + 1}."
+                f"Multi indent detected.\n"
+                + f"File '{file_.name}', line number {i + 1}."
             )
         current_indent = indent
 
