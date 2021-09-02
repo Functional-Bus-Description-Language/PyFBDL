@@ -7,6 +7,7 @@ from ..validation import ValidElements
 
 packages = None
 
+
 def instantiate(after_parse_packages):
     global packages
     packages = after_parse_packages
@@ -43,7 +44,11 @@ def instantiate_type(type, from_type, resolved_arguments):
     log.debug(f"Instantiating type '{type['Type']}' from type '{from_type_type}'.")
 
     if from_type == None:
-        inst = {'Base Type': type['Type'], 'Properties': {}, 'Previous Type': type['Type']}
+        inst = {
+            'Base Type': type['Type'],
+            'Properties': {},
+            'Previous Type': type['Type'],
+        }
     else:
         inst = from_type
 

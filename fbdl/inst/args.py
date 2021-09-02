@@ -30,9 +30,7 @@ def resolve_arguments(symbol, parameters):
                             resolved_arguments[p['Name']] = copy(a['Value'])
                             break
                     else:
-                        resolved_arguments[p['Name']] = copy(
-                            p['Default Value']
-                        )
+                        resolved_arguments[p['Name']] = copy(p['Default Value'])
             else:
                 if i < len(args):
                     resolved_arguments[p['Name']] = copy(args[i]['Value'])
@@ -60,9 +58,7 @@ def resolve_argument_lists_in_symbols(symbols, packages):
         if symbol['Type'] not in ValidElements:
             params = packages.get_symbol(symbol['Type'], symbol).get('Parameters')
             if params:
-                symbol['Resolved Arguments'] = resolve_arguments(
-                    symbol, params
-                )
+                symbol['Resolved Arguments'] = resolve_arguments(symbol, params)
         if 'Symbols' in symbol:
             resolve_argument_lists_in_symbols(symbol['Symbols'], packages)
 

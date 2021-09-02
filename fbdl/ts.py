@@ -2,6 +2,7 @@
 Module for code utilizing tree-sitter.
 """
 import os
+
 dirname = os.path.dirname(os.path.abspath(__file__))
 
 from pprint import pprint, pformat
@@ -11,7 +12,9 @@ this_module = sys.modules[__name__]
 
 from tree_sitter import Language, Parser, TreeCursor
 
-Language.build_library(dirname + '/../build/fbdl.so', [dirname + '/../submodules/tree-sitter-fbdl/'])
+Language.build_library(
+    dirname + '/../build/fbdl.so', [dirname + '/../submodules/tree-sitter-fbdl/']
+)
 FBDLANG = Language(dirname + '/../build/fbdl.so', 'fbdl')
 
 ts_parser = Parser()
@@ -95,6 +98,7 @@ def traverse_tree(tree):
 
             if cursor.goto_next_sibling():
                 retracing = False
+
 
 # TODO below must be done after parsing and before instantiation.
 def validate_properties_and_elements(parser, symbol):
@@ -260,7 +264,6 @@ def parse_element_anonymous_instantiation(parser):
             f"Invalid instance name '{name}'.\n"
             + "Element instance can not have the same name as base type.\n"
             + parser.file_line_msg(parser.node)
-
         )
     return [(name, symbol)]
 
@@ -384,11 +387,13 @@ def parse_multi_constant_definition(parser):
         symbol = {
             'Id': idgen.generate(),
             'Kind': 'Constant',
-            'Line Number': parser.node.children[i * 3 + 1].start_point[0] + 1
+            'Line Number': parser.node.children[i * 3 + 1].start_point[0] + 1,
         }
         name = parser.get_node_string(parser.node.children[i * 3 + 1])
 
-        expression = expr.build_expression(parser, parser.node.children[i * 3 + 3], symbol)
+        expression = expr.build_expression(
+            parser, parser.node.children[i * 3 + 3], symbol
+        )
         symbol['Value'] = expression
 
         symbols.append((name, symbol))
@@ -451,7 +456,7 @@ def parse_single_constant_definition(parser):
     symbol = {
         'Id': idgen.generate(),
         'Kind': 'Constant',
-        'Line Number': parser.node.children[1].start_point[0] + 1
+        'Line Number': parser.node.children[1].start_point[0] + 1,
     }
     name = parser.get_node_string(parser.node.children[1])
 

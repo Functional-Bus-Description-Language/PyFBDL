@@ -2,6 +2,7 @@
 Module for code related with filling missing properties.
 """
 import sys
+
 this_module = sys.modules[__name__]
 
 # Bus width must be easy to read globally, as whether access to an element
