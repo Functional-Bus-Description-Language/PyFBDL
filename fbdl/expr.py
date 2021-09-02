@@ -80,6 +80,9 @@ class ExprDict(dict):
 
         return sym.value
 
+    def evaluate_true(self):
+        return self._value
+
     def evaluate_qualified_identifier(self):
         pkg_name = self['Package']
         exception_msg = f"File '{self.parser.this_file['Path']}' doesn't import package '{pkg_name}'."
