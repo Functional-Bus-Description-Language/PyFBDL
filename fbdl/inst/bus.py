@@ -134,7 +134,6 @@ def instantiate_type_chain(type_chain):
         if type(val) != int:
             raise Exception("TODO: Wrong type of Count value.")
 
-        print(type_chain)
         if val < 0:
             raise Exception(
                 f"Negative size ({val}) of '{type_chain[-1]['Name']}' array.\n"

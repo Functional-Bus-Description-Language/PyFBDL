@@ -81,6 +81,9 @@ class ExprDict(dict):
     def evaluate_identifier(self):
         sym = Packages.get_symbol(self['String'], self.symbol)
 
+        if 'Value' in sym:
+            return sym['Value'].value
+
         return sym.value
 
     def evaluate_true(self):
