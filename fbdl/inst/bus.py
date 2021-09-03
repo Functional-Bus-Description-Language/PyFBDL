@@ -129,7 +129,19 @@ def instantiate_type_chain(type_chain):
 
     count = type_chain[-1].get('Count')
     if count:
-        inst['Count'] = count.value
+        val = count.value
+
+        if type(val) != int:
+            raise Exception("TODO: Wrong type of Count value.")
+
+        print(type_chain)
+        if val < 0:
+            raise Exception(
+                f"Negative size ({val}) of '{type_chain[-1]['Name']}' array.\n"
+                f"File '{get_file_path(type_chain[-1])}', line {type_chain[-1]['Line Number']}."
+            )
+
+        inst['Count'] = val
 
     fill_missing_properties(inst)
 

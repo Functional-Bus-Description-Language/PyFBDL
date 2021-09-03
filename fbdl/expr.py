@@ -103,16 +103,24 @@ class ExprDict(dict):
     def evaluate_string_literal(self):
         return self._value
 
+    def evaluate_unary_operation(self):
+        operator = self['Operator']
+        operand = self['Operand'].value
 
-def build_binary_operation(parser, node):
-    bo = ExprDict(parser, node)
+        if operator == '+':
+            return operand
+        elif operator == '-':
+            return -operand
+
+def build_binary_operation(parser, node, symbol):
+    bo = ExprDict(parser, node, symbol)
 
     left_child = node.children[0]
     right_child = node.children[2]
 
-    bo['Left'] = getattr(this_module, 'build_' + left_child.type)(parser, left_child)
+    bo['Left'] = getattr(this_module, 'build_' + left_child.type)(parser, left_child, symbol)
     bo['Operator'] = parser.get_node_string(node.children[1])
-    bo['Right'] = getattr(this_module, 'build_' + right_child.type)(parser, right_child)
+    bo['Right'] = getattr(this_module, 'build_' + right_child.type)(parser, right_child, symbol)
 
     return bo
 
@@ -182,7 +190,7 @@ def build_primary_expression(parser, node, symbol):
     pe = ExprDict(parser, node, symbol)
 
     child_node = node.children[0]
-    pe['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node)
+    pe['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node, symbol)
 
     return pe
 
@@ -215,3 +223,14 @@ def build_string_literal(parser, node, symbol):
     sl.value = str(sl['String'][1:-1])
 
     return sl
+
+
+def build_unary_operation(parser, node, symbol):
+    bo = ExprDict(parser, node, symbol)
+
+    operand = node.children[1]
+
+    bo['Operator'] = parser.get_node_string(node.children[0])
+    bo['Operand'] = getattr(this_module, 'build_' + operand.type)(parser, operand, symbol)
+
+    return bo

@@ -1,0 +1,4 @@
+type t_mask mask
+
+main bus
+	par2 [-2]t_mask
