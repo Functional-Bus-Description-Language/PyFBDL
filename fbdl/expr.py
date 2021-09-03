@@ -100,6 +100,9 @@ class ExprDict(dict):
 
         return symbols[self['Identifier']]['Value'].value
 
+    def evaluate_string_literal(self):
+        return self._value
+
 
 def build_binary_operation(parser, node):
     bo = ExprDict(parser, node)
@@ -114,8 +117,8 @@ def build_binary_operation(parser, node):
     return bo
 
 
-def build_binary_literal(parser, node):
-    bl = ExprDict(parser, node)
+def build_binary_literal(parser, node, symbol):
+    bl = ExprDict(parser, node, symbol)
     bl.value = int(bl['String'], base=2)
 
     return bl
@@ -205,3 +208,10 @@ def build_qualified_identifier(parser, node, symbol):
         )
 
     return qi
+
+
+def build_string_literal(parser, node, symbol):
+    sl = ExprDict(parser, node, symbol)
+    sl.value = str(sl['String'][1:-1])
+
+    return sl
