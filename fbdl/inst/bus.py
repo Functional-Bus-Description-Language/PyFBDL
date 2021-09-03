@@ -132,7 +132,7 @@ def instantiate_type_chain(type_chain):
         val = count.value
 
         if type(val) != int:
-            raise Exception("TODO: Wrong type of Count value.")
+            raise Exception(f"TODO: Wrong type '{type(val)}' of Count value.")
 
         if val < 0:
             raise Exception(

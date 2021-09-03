@@ -38,9 +38,7 @@ class ExprDict(dict):
         else:
             self.value = getattr(self, 'evaluate_' + kind)()
 
-        # If evaluated successfully return.
-        if self._value:
-            return self._value
+        return self._value
 
     @value.setter
     def value(self, v):
@@ -114,6 +112,10 @@ class ExprDict(dict):
             return operand
         elif operator == '-':
             return -operand
+
+    def evaluate_zero_literal(self):
+        return self._value
+
 
 def build_binary_operation(parser, node, symbol):
     bo = ExprDict(parser, node, symbol)
@@ -237,3 +239,10 @@ def build_unary_operation(parser, node, symbol):
     bo['Operand'] = getattr(this_module, 'build_' + operand.type)(parser, operand, symbol)
 
     return bo
+
+
+def build_zero_literal(parser, node, symbol):
+    z = ExprDict(parser, node, symbol)
+    z.value = 0
+
+    return z
