@@ -44,3 +44,6 @@ def validate_elements(elements, element_type):
             return e, v['Type']
 
     return None, None
+
+
+ValidBuiltInFunctions = {'abs': 1, 'ceil': 1, 'floor': 1, 'log': 2, 'log2': 1, 'log10': 1, 'remainder': 2}

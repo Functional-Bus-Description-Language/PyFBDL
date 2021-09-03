@@ -4,12 +4,14 @@ Module for code related with expressions.
 All build_* and evaluate_* functions are in alphabetical order.
 """
 import logging as log
+import math
 import sys
-from pprint import pprint
+from pprint import pformat, pprint
 
 this_module = sys.modules[__name__]
 
 from .packages import Packages
+from .validation import ValidBuiltInFunctions
 
 
 class ExprDict(dict):
@@ -72,6 +74,23 @@ class ExprDict(dict):
             return left << right
         elif operator == '>>':
             return left >> right
+
+    def evaluate_call(self):
+        func = self['Function']
+        if func == "abs":
+            return abs(self['Arguments'][0].value)
+        if func == "ceil":
+            return math.ceil(self['Arguments'][0].value)
+        if func == "floor":
+            return math.floor(self['Arguments'][0].value)
+        if func == "log":
+            return math.log(self['Arguments'][0].value, self['Arguments'][1].value)
+        if func == "log2":
+            return math.log2(self['Arguments'][0].value)
+        if func == "log10":
+            return math.log10(self['Arguments'][0].value)
+        if func == "remainder":
+            return math.remainder(self['Arguments'][0].value, self['Arguments'][1].value)
 
     def evaluate_decimal_literal(self):
         return self._value
@@ -150,6 +169,38 @@ def build_binary_literal(parser, node, symbol):
     return bl
 
 
+def build_call(parser, node, symbol):
+    c = ExprDict(parser, node, symbol)
+
+    c['Function'] = parser.get_node_string(node.children[0])
+    if c['Function'] not in ValidBuiltInFunctions:
+        raise Exception(
+            f"Invalid function '{c['Function']}' in expression.\n"
+            + f"File {parser.this_file['Path']}, line {node.children[0].start_point[0] + 1}.\n"
+            + f"Valid built-in functions are: {pformat(ValidBuiltInFunctions.keys())[11:-2]}."
+        )
+
+    c['Arguments'] = []
+    for child_node in node.children[2:]:
+        if child_node.type == ')':
+            break
+        if child_node.type == ',':
+            continue
+
+        a = build_expression(parser, child_node, symbol)
+        c['Arguments'].append(a)
+
+    if len(c['Arguments']) != ValidBuiltInFunctions[c['Function']]:
+        raise Exception(
+            f"Built-in function '{c['Function']}' takes "
+            + f"{ValidBuiltInFunctions[c['Function']]} {'argument' if ValidBuiltInFunctions[c['Function']] == 1 else 'arguments'}, "
+            + f"but {len(c['Arguments'])} provided.\n"
+            + f"File {parser.this_file['Path']}, line {node.children[0].start_point[0] + 1}."
+        )
+
+    return c
+
+
 def build_decimal_literal(parser, node, symbol):
     dl = ExprDict(parser, node, symbol)
     dl.value = int(dl['String'])
@@ -199,7 +250,9 @@ def build_parenthesized_expression(parser, node, symbol):
     pe = ExprDict(parser, node, symbol)
 
     child_node = node.children[1]
-    pe['Child'] = getattr(this_module, 'build_' + child_node.type)(parser, child_node)
+    pe['Child'] = getattr(this_module, 'build_' + child_node.type)(
+        parser, child_node, symbol
+    )
 
     return pe
 
