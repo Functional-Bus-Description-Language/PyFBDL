@@ -100,40 +100,6 @@ def traverse_tree(tree):
                 retracing = False
 
 
-# TODO below must be done after parsing and before instantiation.
-def validate_properties_and_elements(parser, symbol):
-    # Check if properties are valid for given element type.
-    wrong_prop = None
-    if symbol.get('Properties'):
-        wrong_prop = validate_properties(symbol['Properties'], symbol['Type'])
-    if wrong_prop:
-        raise Exception(
-            f"Property '{wrong_prop}' is not valid property for {symbol['Type']} element. "
-            + f"File '{parser.this_file['Path']}', line {symbol['Properties'][wrong_prop]['Line Number']}."
-        )
-
-    # Check if inner elements are valid for given outter element type.
-    wrong_elem_name = None
-    if symbol.get('Symbols'):
-        elements = {
-            k: v
-            for k, v in symbol['Symbols'].items()
-            if v['Kind']
-            in [
-                'Element Type Definition',
-                'Element Anonymous Instantiation',
-                'Element Definitive Instantiation',
-            ]
-        }
-        wrong_elem_name, wrong_elem_type = validate_elements(elements, symbol['Type'])
-    if wrong_elem_name:
-        raise Exception(
-            f"Element type '{wrong_elem_type}' is not valid inner element type for '{symbol['Type']}' element type. "
-            + f"File '{parser.this_file['Path']}', line {symbol['Symbols'][wrong_elem_name]['Line Number']}. "
-            + f"Valid inner element types for '{symbol['Type']}' are: {pformat(ValidElements[symbol['Type']]['Valid Elements'])}."
-        )
-
-
 def parse(packages):
     for pkg_name, pkgs in packages.items():
         for pkg in pkgs:

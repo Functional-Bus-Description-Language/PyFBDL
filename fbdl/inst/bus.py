@@ -74,6 +74,13 @@ def instantiate_type(type, from_type, resolved_arguments):
     properties = type.get('Properties')
     if properties:
         for name, p in properties.items():
+            if name not in ValidElements[inst['Base Type']]['Valid Properties']:
+                raise Exception (
+                    f"Property '{name}' is not valid property for element '{type['Name']}' of base type '{inst['Base Type']}'.\n"
+                    + f"File '{get_file_path(type)}', line {p['Line Number']}.\n"
+                    + f"Valid properties for '{inst['Base Type']}' are: "
+                    + f"{pformat(ValidElements[inst['Base Type']]['Valid Properties'])}."
+                )
             if name in inst['Properties']:
                 raise Exception(
                     f"{type['Kind']}, can not set property '{name}' in symbol '{type['Name']}'.\n"

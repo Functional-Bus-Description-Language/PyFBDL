@@ -1,0 +1,6 @@
+type t_conf config
+
+main bus
+
+	foo t_conf
+		adf = 1203

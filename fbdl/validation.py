@@ -17,7 +17,7 @@ ValidElements = {
     'func': {'Valid Elements': ('param'), 'Valid Properties': ('doc')},
     'mask': {
         'Valid Elements': (),
-        'Valid Properties': ('atomic', 'default', 'doc', 'groups' 'width'),
+        'Valid Properties': ('atomic', 'default', 'doc', 'groups', 'width'),
     },
     'param': {
         'Valid Elements': (),

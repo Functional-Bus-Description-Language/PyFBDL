@@ -1,0 +1,3 @@
+Exception: Property 'adf' is not valid property for element 'foo' of base type 'config'.
+File 'bus.fbd', line 6.
+Valid properties for 'config' are: ('atomic', 'default', 'doc', 'groups', 'range', 'once', 'width').
