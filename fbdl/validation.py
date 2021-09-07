@@ -12,7 +12,7 @@ ValidElements = {
     },
     'config': {
         'Valid Elements': (),
-        'Valid Properties': ('atomic', 'default', 'doc', 'groups', 'once', 'width'),
+        'Valid Properties': ('atomic', 'default', 'doc', 'groups', 'range', 'once', 'width'),
     },
     'func': {'Valid Elements': ('param'), 'Valid Properties': ('doc')},
     'mask': {
