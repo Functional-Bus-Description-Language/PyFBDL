@@ -95,6 +95,14 @@ class ExprDict(dict):
     def evaluate_decimal_literal(self):
         return self._value
 
+    def evaluate_expression_list(self):
+        list_ = []
+
+        for e in self['Expressions']:
+            list_.append(e.value)
+
+        return list_
+
     def evaluate_false(self):
         return self._value
 
@@ -131,6 +139,12 @@ class ExprDict(dict):
 
     def evaluate_string_literal(self):
         return self._value
+
+    def evaluate_subscript(self):
+        sym = Packages.get_symbol(self['Name'], self.symbol)
+        idx = self['Index'].value
+
+        return sym['Value'].value[idx]
 
     def evaluate_unary_operation(self):
         operator = self['Operator']
@@ -211,12 +225,30 @@ def build_decimal_literal(parser, node, symbol):
 def build_expression(parser, node, symbol):
     e = ExprDict(parser, node, symbol)
 
-    child_node = node.children[0]
-    e['Child'] = getattr(this_module, 'build_' + child_node.type)(
-        parser, child_node, symbol
-    )
+    if node.type == 'expression_list':
+        e = build_expression_list(parser, node, symbol)
+    else:
+        child_node = node.children[0]
+        e['Child'] = getattr(this_module, 'build_' + child_node.type)(
+            parser, child_node, symbol
+        )
 
     return e
+
+
+def build_expression_list(parser, node, symbol):
+    el = ExprDict(parser, node, symbol)
+
+    el['Expressions'] = []
+
+    for child in node.children[1:]:
+        if child.type in [',', ']']:
+            continue
+
+        expr = build_expression(parser, child, symbol)
+        el['Expressions'].append(expr)
+
+    return el
 
 
 def build_false(parser, node, symbol):
@@ -296,6 +328,14 @@ def build_string_literal(parser, node, symbol):
     sl.value = str(sl['String'][1:-1])
 
     return sl
+
+
+def build_subscript(parser, node, symbol):
+    ss = ExprDict(parser, node, symbol)
+    ss['Name'] = parser.get_node_string(node.children[0])
+    ss['Index'] = build_expression(parser, node.children[2], symbol)
+
+    return ss
 
 
 def build_unary_operation(parser, node, symbol):
