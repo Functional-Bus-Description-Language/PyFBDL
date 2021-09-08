@@ -1,0 +1,3 @@
+Exception: The 'atomic' property must be of type 'bool'.
+Current type 'int'.
+File 'bus.fbd', line 3.

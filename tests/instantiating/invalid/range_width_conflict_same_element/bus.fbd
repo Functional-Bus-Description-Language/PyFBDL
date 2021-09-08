@@ -1,0 +1,4 @@
+main bus
+	foo config
+		range = [1, 5]
+		width = 10

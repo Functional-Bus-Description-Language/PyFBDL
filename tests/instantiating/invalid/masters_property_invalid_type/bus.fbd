@@ -1,0 +1,3 @@
+main bus
+	masters = true
+	foo status

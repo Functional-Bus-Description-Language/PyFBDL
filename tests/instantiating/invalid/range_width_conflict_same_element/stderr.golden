@@ -1,0 +1,2 @@
+Exception: Can not set the 'width' property, because the 'range' property is already set in line 3.
+File 'bus.fbd', line 4.

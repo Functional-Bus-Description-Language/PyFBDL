@@ -1,0 +1,3 @@
+main bus
+	foo config
+		once = 0

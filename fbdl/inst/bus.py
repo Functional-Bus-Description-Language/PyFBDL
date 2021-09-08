@@ -53,6 +53,93 @@ def resolve_to_base_type(symbol):
     return type_chain
 
 
+def check_property(name, prop, elem_type):
+    """Check property value type, value and conflicting properties within element."""
+
+    def file_line_msg():
+        return f"File '{get_file_path(elem_type)}', line {prop['Line Number']}."
+
+    def wrong_type_msg(excepted_type):
+        return (
+            f"The '{name}' property must be of type '{excepted_type}'.\n"
+            + f"Current type '{type_.__name__}'.\n"
+            + file_line_msg()
+        )
+
+    def negative_value_msg():
+        return (
+            f"Negative value ({prop['Value'].value}) of the '{name}' property.\n"
+            + file_line_msg()
+        )
+
+    value = prop['Value'].value
+    type_ = type(value)
+    if name in ['atomic', 'once']:
+        if type_ != bool:
+            raise Exception(wrong_type_msg('bool'))
+    elif name == 'doc':
+        if type_ != str:
+            raise Exception(wrong_type_msg('str'))
+    elif name == 'masters':
+        if type_ != int:
+            raise Exception(wrong_type_msg('int'))
+        if value < 1:
+            raise Exception(
+                f"Value of the 'masters' property must be positive.\n"
+                + f"Current value {value}.\n"
+                + file_line_msg()
+            )
+    elif name == 'range':
+        if type_ != list:
+            raise Exception(wrong_type_msg('list'))
+        elif len(value) != 2:
+            raise Exception(
+                "Length of the 'range' property value list must equal two.\n"
+                + f"Current length {len(value)}.\n"
+                + file_line_msg()
+            )
+        elif type(value[0]) != int or type(value[1]) != int:
+            raise Exception(
+                "Both values in the 'range' property value list must be of type int.\n"
+                f"Current types '{type(value[0]).__name__}' and '{type(value[1]).__name__}'.\n"
+                + file_line_msg()
+            )
+        elif value[0] >= value[1]:
+            raise Exception(
+                "Second value in the 'range' property value list must be greater than the first one.\n"
+                + f"First value {value[0]}, second value {value[1]}.\n"
+                + file_line_msg()
+            )
+    elif name == 'width':
+        if type_ != int:
+            raise Exception(wrong_type_msg('int'))
+        if value < 0:
+            raise Exception(negative_value_msg())
+        if 'range' in elem_type['Properties']:
+            raise Exception(
+                "Can not set the 'width' property, because the 'range' property is "
+                + f"already set in line {elem_type['Properties']['range']['Line Number']}.\n"
+                + file_line_msg()
+            )
+
+
+def check_property_conflict(name, prop, elem_type, inst):
+    """Check properties conflict between types."""
+    def conflict_msg(first, second):
+        return (
+            f"Can not set the '{first}' property, because the '{second}' "
+            + "property is already set in one of the ancestor types.\n"
+            + f"File '{get_file_path(elem_type)}', line {prop['Line Number']}."
+        )
+
+    if name == 'range':
+        if 'width' in inst['Properties']:
+            raise Exception(conflict_msg('range', 'width'))
+    elif name == 'width':
+        if 'range' in inst['Properties']:
+            raise Exception(conflict_msg('width', 'range'))
+
+
 def instantiate_type(type, from_type, resolved_arguments):
     if resolved_arguments is not None:
         type['Resolved Arguments'] = resolved_arguments
@@ -73,22 +160,26 @@ def instantiate_type(type, from_type, resolved_arguments):
 
     properties = type.get('Properties')
     if properties:
-        for name, p in properties.items():
+        for name, prop in properties.items():
             if name not in ValidElements[inst['Base Type']]['Valid Properties']:
-                raise Exception (
+                raise Exception(
                     f"Property '{name}' is not valid property for element '{type['Name']}' of base type '{inst['Base Type']}'.\n"
-                    + f"File '{get_file_path(type)}', line {p['Line Number']}.\n"
+                    + f"File '{get_file_path(type)}', line {prop['Line Number']}.\n"
                     + f"Valid properties for '{inst['Base Type']}' are: "
                     + f"{pformat(ValidElements[inst['Base Type']]['Valid Properties'])}."
                 )
+
+            check_property(name, prop, type)
+            check_property_conflict(name, prop, type, inst)
+
             if name in inst['Properties']:
                 raise Exception(
                     f"{type['Kind']}, can not set property '{name}' in symbol '{type['Name']}'.\n"
                     + "The property is alrady set in one of the ancestor types.\n"
-                    + f"File '{get_file_path(type)}', line {p['Line Number']}."
+                    + f"File '{get_file_path(type)}', line {prop['Line Number']}."
                 )
 
-            inst['Properties'][name] = p['Value'].value
+            inst['Properties'][name] = prop['Value'].value
 
     symbols = type.get('Symbols')
     if symbols:

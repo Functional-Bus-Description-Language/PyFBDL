@@ -1,0 +1,3 @@
+Exception: Length of the 'range' property value list must equal two.
+Current length 3.
+File 'bus.fbd', line 3.

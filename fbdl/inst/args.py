@@ -8,7 +8,7 @@ from ..validation import ValidElements
 
 def resolve_arguments(symbol, parameters):
     # TODO: Veiryf if there is a need to copy here.
-    # Probably not with the approach where the 'Resolbed Arguments' attribute
+    # Probably not with the approach where the 'Resolved Arguments' attribute
     # is temporarily attached to the node with Element Type Definition.
     args = symbol.get('Arguments', ())
     resolved_arguments = {}

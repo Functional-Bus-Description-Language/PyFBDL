@@ -113,7 +113,11 @@ class ExprDict(dict):
         sym = Packages.get_symbol(self['String'], self.symbol)
 
         if 'Value' in sym:
-            return sym['Value'].value
+            val = sym['Value']
+            if type(val) == ExprDict:
+                return val.value
+
+            return val
 
         return sym.value
 

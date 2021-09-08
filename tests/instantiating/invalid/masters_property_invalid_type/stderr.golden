@@ -1,0 +1,3 @@
+Exception: The 'masters' property must be of type 'int'.
+Current type 'bool'.
+File 'bus.fbd', line 2.

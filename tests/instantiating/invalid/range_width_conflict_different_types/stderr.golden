@@ -1,0 +1,2 @@
+Exception: Can not set the 'width' property, because the 'range' property is already set in one of the ancestor types.
+File 'bus.fbd', line 6.

@@ -1,0 +1,3 @@
+Exception: Second value in the 'range' property value list must be greater than the first one.
+First value 1, second value 1.
+File 'bus.fbd', line 3.

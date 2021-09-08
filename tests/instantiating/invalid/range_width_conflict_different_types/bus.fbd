@@ -1,0 +1,6 @@
+type foo config
+	range = [1, 2]
+
+main bus
+	bar foo
+		width = 8

@@ -1,0 +1,3 @@
+Exception: The 'range' property must be of type 'list'.
+Current type 'int'.
+File 'bus.fbd', line 3.
