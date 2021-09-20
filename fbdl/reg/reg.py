@@ -29,6 +29,9 @@ def registerify_main(bus):
 
     registerify_statuses(bus['main'])
 
+    if 'Elements' not in bus['main']:
+        bus['main']['Elements'] = {}
+
     bus['main']['Elements']['_uuid_'] = {
         'Access Info': ((0, (BUS_WIDTH - 1, 0)),),
         'Base Type': 'status',
@@ -50,6 +53,8 @@ def registerify_statuses(block):
     global current_addr
 
     elements = block.get('Elements')
+    if not elements:
+        return None
 
     for name, elem in elements.items():
         if elem['Base Type'] == 'status':

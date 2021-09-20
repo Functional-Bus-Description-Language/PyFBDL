@@ -44,7 +44,7 @@ class Packages(dict):
                 pkg = dict_['Package']
                 break
 
-        if not pkg:
+        if pkg is None:
             raise Exception(
                 f"Reference to the foreign symbol '{symbol}' in file '{node['Path']}', but file does not import package '{pkg_name}'."
             )
@@ -63,7 +63,7 @@ class Packages(dict):
         log.debug(f"Looking for symbol '{symbol}', starting from node '{node['Id']}'.")
 
         if '.' in symbol:
-            return self._get_symbol_foreign_pkg(symbol, node)
+            return Packages._get_symbol_foreign_pkg(symbol, node)
 
         while True:
             if node.get('Symbols'):
