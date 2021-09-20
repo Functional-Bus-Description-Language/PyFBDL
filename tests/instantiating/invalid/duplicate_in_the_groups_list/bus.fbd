@@ -1,0 +1,3 @@
+main bus
+	foo status
+		groups = ["a", "a"]

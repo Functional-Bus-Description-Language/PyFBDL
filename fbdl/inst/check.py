@@ -33,7 +33,6 @@ def check_property(name, prop, elem_type):
         if type_ != str:
             raise Exception(wrong_type_msg('str'))
     elif name == 'groups':
-        # TODO: Check for duplicates on the list.
         if type_ != list:
             raise Exception(wrong_type_msg('list'))
         for group in value:
@@ -42,6 +41,12 @@ def check_property(name, prop, elem_type):
                     "All values in the 'groups' property value list must be of type 'str'.\n"
                     f"'{group}' is of type '{type(group).__name__}'.\n"
                     + file_line_msg()
+                )
+        for i, group in enumerate(value[:-1]):
+            if group in value[i + 1 :]:
+                raise Exception(
+                    "Duplicate in the 'groups' property.\n"
+                    f"Duplicated value \"{group}\".\n" + file_line_msg()
                 )
     elif name == 'masters':
         if type_ != int:
@@ -136,3 +141,5 @@ def check_groups(inst):
         conflict = _check_groups(inst, type)
         if conflict:
             return type, conflict
+
+    return None, None

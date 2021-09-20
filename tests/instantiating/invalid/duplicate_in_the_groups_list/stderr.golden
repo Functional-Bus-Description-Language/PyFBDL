@@ -1,0 +1,3 @@
+Exception: Duplicate in the 'groups' property.
+Duplicated value "a".
+File 'bus.fbd', line 3.
