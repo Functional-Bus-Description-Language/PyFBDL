@@ -4,3 +4,5 @@ __pycache__/
 build/
 packages.txt
 instantiation.txt
+registerified.txt
+/bus.fbd

@@ -8,6 +8,7 @@ import sys
 from fbdl import pre
 from fbdl import ts
 from fbdl.inst import bus
+from fbdl.reg import reg
 
 VERSION = "0.0.0"
 
@@ -36,6 +37,13 @@ def parse_cmd_line_args():
         metavar='file_path',
     )
 
+    parser.add_argument(
+        '-r',
+        help="Dump registerified dictionary to a file.",
+        type=argparse.FileType('w'),
+        metavar='file_path',
+    )
+
     return parser.parse_args()
 
 
@@ -59,6 +67,12 @@ def main():
     if cmd_line_args.i:
         cmd_line_args.i.write(pformat(main_bus) + '\n')
         cmd_line_args.i.close()
+
+    registerified_main_bus = reg.registerify_main(main_bus)
+    if cmd_line_args.r:
+        cmd_line_args.r.write(pformat(registerified_main_bus) + '\n')
+        cmd_line_args.r.close()
+
 
 if __name__ == "__main__":
     main()
