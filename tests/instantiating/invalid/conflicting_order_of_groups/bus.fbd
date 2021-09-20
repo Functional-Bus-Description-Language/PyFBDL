@@ -1,0 +1,7 @@
+main bus
+	my_block block
+		foo status
+			groups = ["a", "b", "c"]
+
+		bar status
+			groups = ["c", "b", "a"]
