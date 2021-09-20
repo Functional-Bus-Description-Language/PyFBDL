@@ -3,7 +3,7 @@ Module for code utilizing tree-sitter.
 """
 import os
 
-dirname = os.path.dirname(os.path.abspath(__file__))
+dirname = '/'.join(os.path.dirname(os.path.abspath(__file__)).split('/')[:-1])
 
 from pprint import pprint, pformat
 import sys
@@ -13,9 +13,9 @@ this_module = sys.modules[__name__]
 from tree_sitter import Language, Parser, TreeCursor
 
 Language.build_library(
-    dirname + '/../build/fbdl.so', [dirname + '/../submodules/tree-sitter-fbdl/']
+    dirname + '/build/fbdl.so', [dirname + '/submodules/tree-sitter-fbdl/']
 )
-FBDLANG = Language(dirname + '/../build/fbdl.so', 'fbdl')
+FBDLANG = Language(dirname + '/build/fbdl.so', 'fbdl')
 
 ts_parser = Parser()
 ts_parser.set_language(FBDLANG)
