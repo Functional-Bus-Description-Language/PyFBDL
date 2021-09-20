@@ -22,6 +22,9 @@ def registerify_main(bus):
     global BUS_WIDTH
     global current_addr
 
+    if 'main' not in bus:
+        return bus
+
     BUS_WIDTH = bus['main']['Properties']['width']
 
     # 0 and 1 are reserved for _uuid_ and _timestamp_.
