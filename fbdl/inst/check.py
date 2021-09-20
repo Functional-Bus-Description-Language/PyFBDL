@@ -111,7 +111,12 @@ def check_property_conflict(name, prop, elem_type, inst):
 
 def _check_groups(inst, type):
     elems_with_groups = []
-    for name, elem in inst['Elements'].items():
+
+    elements = inst.get('Elements')
+    if not elements:
+        return None
+
+    for name, elem in elements.items():
         if elem['Base Type'] == type:
             props = elem.get('Properties')
             if props and 'groups' in props:
