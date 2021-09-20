@@ -1,0 +1,3 @@
+main bus
+	foo ["abc"] status
+		width = 10

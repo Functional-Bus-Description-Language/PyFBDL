@@ -135,6 +135,7 @@ def check_property(name, prop, elem_type):
 
 def check_property_conflict(name, prop, elem_type, inst):
     """Check properties conflict between types."""
+
     def conflict_msg(first, second):
         return (
             f"Can not set the '{first}' property, because the '{second}' "
@@ -240,7 +241,11 @@ def instantiate_type_chain(type_chain):
         val = count.value
 
         if type(val) != int:
-            raise Exception(f"TODO: Wrong type '{type(val)}' of Count value.")
+            raise Exception(
+                "Size of array must be of type 'int'.\n"
+                + f"Current type '{type(val).__name__}'.\n"
+                + f"File '{get_file_path(type_chain[-1])}', line {type_chain[-1]['Line Number']}."
+            )
 
         if val < 0:
             raise Exception(

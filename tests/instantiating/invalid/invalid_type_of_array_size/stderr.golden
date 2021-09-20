@@ -1,0 +1,3 @@
+Exception: Size of array must be of type 'int'.
+Current type 'str'.
+File 'bus.fbd', line 2.
