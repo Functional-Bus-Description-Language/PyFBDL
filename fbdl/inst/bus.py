@@ -80,6 +80,16 @@ def check_property(name, prop, elem_type):
     elif name == 'doc':
         if type_ != str:
             raise Exception(wrong_type_msg('str'))
+    elif name == 'groups':
+        if type_ != list:
+            raise Exception(wrong_type_msg('list'))
+        for group in value:
+            if type(group) != str:
+                raise Exception(
+                    "All values in the 'groups' property value list must be of type 'str'.\n"
+                    f"'{group}' is of type '{type(group).__name__}'.\n"
+                    + file_line_msg()
+                )
     elif name == 'masters':
         if type_ != int:
             raise Exception(wrong_type_msg('int'))
@@ -100,7 +110,7 @@ def check_property(name, prop, elem_type):
             )
         elif type(value[0]) != int or type(value[1]) != int:
             raise Exception(
-                "Both values in the 'range' property value list must be of type int.\n"
+                "Both values in the 'range' property value list must be of type 'int'.\n"
                 f"Current types '{type(value[0]).__name__}' and '{type(value[1]).__name__}'.\n"
                 + file_line_msg()
             )

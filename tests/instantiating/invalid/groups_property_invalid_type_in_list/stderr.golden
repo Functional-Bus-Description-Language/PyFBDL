@@ -1,0 +1,3 @@
+Exception: All values in the 'groups' property value list must be of type 'str'.
+'1' is of type 'int'.
+File 'bus.fbd', line 3.

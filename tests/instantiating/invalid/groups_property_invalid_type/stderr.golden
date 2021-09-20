@@ -1,0 +1,3 @@
+Exception: The 'groups' property must be of type 'list'.
+Current type 'str'.
+File 'bus.fbd', line 3.
