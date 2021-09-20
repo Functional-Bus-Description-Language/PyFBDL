@@ -130,10 +130,9 @@ def _check_groups(inst, type):
                     )
                 prev_id = id
 
-    return None
-
 
 def check_groups(inst):
-    conflict = _check_groups(inst, 'status')
-    if conflict:
-        return 'status', conflict
+    for type in ['config', 'status']:
+        conflict = _check_groups(inst, type)
+        if conflict:
+            return type, conflict

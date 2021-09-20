@@ -1,0 +1,7 @@
+main bus
+	my_block block
+		foo config
+			groups = ["a", "b"]
+
+		bar config
+			groups = ["b", "a"]
