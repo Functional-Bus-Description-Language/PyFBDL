@@ -6,6 +6,7 @@ Optinal implemenation is not an easy task.
 """
 
 import math
+import logging as log
 import random
 import time
 
@@ -23,7 +24,8 @@ def registerify_main(bus):
     global current_addr
 
     if 'main' not in bus:
-        return bus
+        log.warn("Registerification. There is no main bus. Returning empty dictionary.")
+        return {}
 
     BUS_WIDTH = bus['main']['Properties']['width']
 

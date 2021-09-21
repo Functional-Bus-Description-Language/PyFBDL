@@ -15,6 +15,7 @@ def instantiate(after_parse_packages):
     packages = after_parse_packages
 
     if 'main' not in packages['main'][0]['Symbols']:
+        log.warn("Instantiation. There is no main bus. Returning empty dictionary.")
         return {}
 
     set_bus_width(packages)
