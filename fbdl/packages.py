@@ -55,6 +55,8 @@ class Packages(dict):
                 + f"Package 'pkg_name' does not have symbol '{sym}'."
             )
 
+        return pkg['Symbols'][sym]
+
     @staticmethod
     def get_symbol(symbol, scope):
         """Get reference to the symbol. Start searching from given scope."""
