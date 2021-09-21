@@ -8,7 +8,7 @@
                                               'Line Number': 1,
                                               'Name': 'my_type',
                                               'Parent': RD to '0x1000',
-                                              'Type': 'foo.bar'}}}],
+                                              'Type': 'foo.Bar'}}}],
            'Id': '0x1001',
            'Kind': 'Package',
            'Path': '/home/mkru/workspace/FBDL/PyFBDL/tests/parsing/valid/element_type_definition_qualified_identifier/bus.fbd',

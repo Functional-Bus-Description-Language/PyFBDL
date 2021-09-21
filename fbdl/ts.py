@@ -203,7 +203,7 @@ def parse_element_anonymous_instantiation(parser):
         'Id': idgen.generate(),
         'Kind': 'Element Anonymous Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
-        'Name': parser.get_node_string(parser.node.children[0])
+        'Name': parser.get_node_string(parser.node.children[0]),
     }
 
     if parser.node.children[1].type == '[':
@@ -278,7 +278,7 @@ def parse_element_type_definition(parser):
         'Id': idgen.generate(),
         'Kind': 'Element Type Definition',
         'Line Number': parser.node.start_point[0] + 1,
-        'Name': parser.get_node_string(parser.node.children[1])
+        'Name': parser.get_node_string(parser.node.children[1]),
     }
 
     type_node = None
@@ -287,8 +287,19 @@ def parse_element_type_definition(parser):
             symbol['Parameters'] = parse_parameter_list(
                 ParserFromNode(parser, node), symbol
             )
-        elif node.type in ['identifier', 'qualified_identifier']:
+        elif node.type == 'identifier':
             symbol['Type'] = parser.get_node_string(node)
+            type_node = node
+        elif node.type == 'qualified_identifier':
+            qi = parser.get_node_string(node)
+            pkg, id = qi.split('.')
+            if not id[0].isupper():
+                raise Exception(
+                    f"Symbol '{id}', imported from package '{pkg}', starts with lower case letter.\n"
+                    + f"Maybe you meant '{pkg + '.'+ id[0].upper() + id[1:]}' or '{id}' instead of '{qi}'?\n"
+                    + parser.file_line_msg(parser.node)
+                )
+            symbol['Type'] = qi
             type_node = node
         elif node.type == 'argument_list':
             symbol['Arguments'] = parse_argument_list(
@@ -320,16 +331,24 @@ def parse_element_definitive_instantiation(parser):
         'Id': idgen.generate(),
         'Kind': 'Element Definitive Instantiation',
         'Line Number': parser.node.start_point[0] + 1,
-        'Name': parser.get_node_string(parser.node.children[0])
+        'Name': parser.get_node_string(parser.node.children[0]),
     }
 
     if parser.node.children[1].type == '[':
         symbol['Count'] = expr.build_expression(parser, parser.node.children[2], symbol)
 
-    if parser.node.children[1].type == 'identifier':
+    if parser.node.children[1].type in ['identifier', 'qualified_identifier']:
         symbol['Type'] = parser.get_node_string(parser.node.children[1])
     else:
         symbol['Type'] = parser.get_node_string(parser.node.children[4])
+    if '.' in symbol['Type']:
+        pkg, id = symbol['Type'].split('.')
+        if not id[0].isupper():
+            raise Exception(
+                f"Symbol '{id}', imported from package '{pkg}', starts with lower case letter.\n"
+                + f"Maybe you meant '{pkg + '.'+ id[0].upper() + id[1:]}' or '{id}' instead of '{symbol['Type']}'?\n"
+                + parser.file_line_msg(parser.node)
+            )
 
     if parser.node.children[-2].type == 'argument_list':
         symbol['Arguments'] = parse_argument_list(
@@ -370,7 +389,7 @@ def parse_multi_constant_definition(parser):
             'Id': idgen.generate(),
             'Kind': 'Constant',
             'Line Number': parser.node.children[i * 3 + 1].start_point[0] + 1,
-            'Name': parser.get_node_string(parser.node.children[i * 3 + 1])
+            'Name': parser.get_node_string(parser.node.children[i * 3 + 1]),
         }
 
         expression = expr.build_expression(
@@ -439,7 +458,7 @@ def parse_single_constant_definition(parser):
         'Id': idgen.generate(),
         'Kind': 'Constant',
         'Line Number': parser.node.children[1].start_point[0] + 1,
-        'Name': parser.get_node_string(parser.node.children[1])
+        'Name': parser.get_node_string(parser.node.children[1]),
     }
 
     expression = expr.build_expression(parser, parser.node.children[3], symbol)
