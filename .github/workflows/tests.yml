@@ -26,7 +26,7 @@ jobs:
       - run: python -m pip install networkx
       - run: python -m unittest
 
-  Parsing_Tests:
+  Parsing-Tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
@@ -47,7 +47,7 @@ jobs:
 
       - run: ./scripts/test_parsing.sh
 
-  Instantiating_Tests:
+  Instantiating-Tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository and submodules
