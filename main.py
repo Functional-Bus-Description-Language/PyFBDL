@@ -19,6 +19,10 @@ def parse_cmd_line_args():
         description="Functional Bus Description Language compiler front-end written in Python.",
     )
 
+    parser.add_argument(
+        '-v', '--version', help="Display version.", action="version", version=VERSION
+    )
+
     parser.add_argument('main', help="Path to the main file.")
 
     parser.add_argument('-d', help="Log debug messages.", action='store_true')
