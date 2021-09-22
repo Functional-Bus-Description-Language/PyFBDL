@@ -10,7 +10,7 @@ from fbdl import ts
 from fbdl.inst import bus
 from fbdl.reg import reg
 
-VERSION = "0.0.0"
+VERSION = "0.1.0"
 
 
 def parse_cmd_line_args():
