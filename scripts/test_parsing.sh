@@ -19,7 +19,7 @@ do
 	python3 ../../../../main.py -p packages bus.fbd > /dev/null 2>&1
 	sed '/Path/d' packages > packages.sed
 	sed '/Path/d' packages.golden > packages.golden.sed
-	cmp packages.golden.sed packages.sed
+	diff packages.golden.sed packages.sed
 	rm packages
 	rm *.sed
 	cd ../..
@@ -32,7 +32,7 @@ do
 	cd $dir
 	python3 ../../../../main.py bus.fbd > /dev/null 2>stderr || true
 	grep -A100 '^Exception' stderr > stderr.grep
-	cmp stderr.golden stderr.grep
+	diff stderr.golden stderr.grep
 	rm stderr stderr.grep
 	cd ../..
 done
