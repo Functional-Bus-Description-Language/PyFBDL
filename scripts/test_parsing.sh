@@ -17,8 +17,8 @@ do
 	echo "Running test $dir"
 	cd $dir
 	python3 ../../../../main.py -p packages bus.fbd > /dev/null 2>&1
-	sed '/Path/d' packages > packages.sed
-	sed '/Path/d' packages.golden > packages.golden.sed
+	sed '/\/home\//d' packages > packages.sed
+	sed '/\/home\//d' packages.golden > packages.golden.sed
 	diff packages.golden.sed packages.sed
 	rm packages
 	rm *.sed
