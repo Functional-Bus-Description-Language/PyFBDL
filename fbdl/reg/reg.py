@@ -38,12 +38,12 @@ def registerify_main(bus):
         bus['main']['Elements'] = {}
 
     bus['main']['Elements']['_uuid_'] = {
-        'Access Info': ((0, (BUS_WIDTH - 1, 0)),),
+        'Registers': ((0, (BUS_WIDTH - 1, 0)),),
         'Base Type': 'status',
         'Properties': {'default': random.randint(0, 2 ** BUS_WIDTH - 1)},
     }
     bus['main']['Elements']['_timestamp_'] = {
-        'Access Info': ((1, (BUS_WIDTH - 1, 0)),),
+        'Registers': ((1, (BUS_WIDTH - 1, 0)),),
         'Base Type': 'status',
         'Properties': {'default': int(time.time()) & (2 ** BUS_WIDTH - 1)},
     }
@@ -61,12 +61,54 @@ def registerify_statuses(block):
     if not elements:
         return None
 
-    for name, elem in elements.items():
-        if elem['Base Type'] == 'status':
-            access_info = []
-            width = elem['Properties']['width']
+    class ArrayIterator:
+        def __init__(self, count, base_addr, width):
+            self.count = count
+            self.base_addr = base_addr
+            self.width = width
+            self.item_width = math.ceil(width / BUS_WIDTH)
+
+        def __repr__(self):
+            return f"'Base Address': {self.base_addr}, 'Items': {self.count}, 'Item Width': {self.item_width}"
+
+        def __len__(self):
+            return self.count
+
+        def __getitem__(self, idx):
+            if idx < 0 or self.count <= idx:
+                raise IndexError()
+
+            item_addr = self.base_addr + item_width * idx
+
+            registers = []
+            for i in self.item_width:
+                registers.append(
+                    (
+                        item_addr,
+                        (
+                            BUS_WIDTH - 1
+                            if self.width - i * BUS_WIDTH > BUS_WIDTH
+                            else self.width - 1 - i * BUS_WIDTH,
+                            0,
+                        ),
+                    )
+                )
+                item_addr += 1
+
+            return registers
+
+    statuses = [elem for _, elem in elements.items() if elem['Base Type'] == 'status']
+
+    for status in statuses:
+        registers = []
+        width = status['Properties']['width']
+
+        if 'Count' in status:
+            status['Registers'] = ArrayIterator(status['Count'], current_addr, width)
+            current_addr += math.ceil(width / BUS_WIDTH) * status['Count']
+        else:
             for i in range(math.ceil(width / BUS_WIDTH)):
-                access_info.append(
+                registers.append(
                     (
                         current_addr,
                         (
@@ -79,4 +121,4 @@ def registerify_statuses(block):
                 )
                 current_addr += 1
 
-            elem['Access Info'] = tuple(access_info)
+            status['Registers'] = tuple(registers)
