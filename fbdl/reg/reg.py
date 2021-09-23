@@ -7,21 +7,16 @@ Optinal implemenation is not an easy task.
 
 import math
 import logging as log
+import math
 import random
 import time
 
 
 BUS_WIDTH = None
 
-# Current access address within given block.
-# This is global, so currentlu is is not possible to parallelize
-# the access address assigning process.
-current_addr = 0
 
-
-def registerify_main(bus):
+def registerify(bus):
     global BUS_WIDTH
-    global current_addr
 
     if 'main' not in bus:
         log.warn("Registerification. There is no main bus. Returning empty dictionary.")
@@ -32,7 +27,7 @@ def registerify_main(bus):
     # 0 and 1 are reserved for _uuid_ and _timestamp_.
     current_addr = 2
 
-    registerify_statuses(bus['main'])
+    current_addr = registerify_statuses(bus['main'], current_addr)
 
     if 'Elements' not in bus['main']:
         bus['main']['Elements'] = {}
@@ -49,14 +44,13 @@ def registerify_main(bus):
     }
 
     bus['main']['Size'] = current_addr
+    #    bus['main']['Aligned Size'] = 2** math.ceil(math.log(current_addr, 2))
 
     return bus
 
 
-def registerify_statuses(block):
+def registerify_statuses(block, current_addr):
     """This is extremely trivial approach. Even groups are not respected."""
-    global current_addr
-
     elements = block.get('Elements')
     if not elements:
         return None
@@ -122,3 +116,5 @@ def registerify_statuses(block):
                 current_addr += 1
 
             status['Registers'] = tuple(registers)
+
+    return current_addr

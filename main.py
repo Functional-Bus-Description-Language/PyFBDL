@@ -7,7 +7,7 @@ import sys
 
 from fbdl import pre
 from fbdl import ts
-from fbdl.inst import bus
+from fbdl.inst import inst
 from fbdl.reg import reg
 
 VERSION = "0.2.0"
@@ -67,14 +67,14 @@ def main():
         cmd_line_args.p.write(pformat(packages) + '\n')
         cmd_line_args.p.close()
 
-    main_bus = bus.instantiate(packages)
+    bus = inst.instantiate(packages)
     if cmd_line_args.i:
-        cmd_line_args.i.write(pformat(main_bus) + '\n')
+        cmd_line_args.i.write(pformat(bus) + '\n')
         cmd_line_args.i.close()
 
-    registerified_main_bus = reg.registerify_main(main_bus)
+    registerified_bus = reg.registerify(bus)
     if cmd_line_args.r:
-        cmd_line_args.r.write(pformat(registerified_main_bus) + '\n')
+        cmd_line_args.r.write(pformat(registerified_bus) + '\n')
         cmd_line_args.r.close()
 
 
