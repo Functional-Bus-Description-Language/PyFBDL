@@ -32,7 +32,9 @@ def fill_missing_properties(inst):
 
 
 def fill_missing_properties_block(inst):
-    pass
+    if 'masters' not in inst['Properties']:
+        inst['Properties']['masters'] = 1
+
 
 def fill_missing_properties_config(inst):
     if 'width' not in inst['Properties']:
