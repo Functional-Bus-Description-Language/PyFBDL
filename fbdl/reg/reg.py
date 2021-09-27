@@ -5,14 +5,19 @@ Current implemenation is very trivial.
 Optinal implemenation is not an easy task.
 """
 
-import math
 import logging as log
 import math
-import random
 import time
+import zlib
+
+from . import iters
 
 
 BUS_WIDTH = None
+
+
+def align_to_power_of_2(val):
+    return 2 ** math.ceil(math.log(val, 2))
 
 
 def registerify(bus):
@@ -24,72 +29,61 @@ def registerify(bus):
 
     BUS_WIDTH = bus['main']['Properties']['width']
 
-    # 0 and 1 are reserved for _uuid_ and _timestamp_.
-    current_addr = 2
+    # addr is current block internal access address, not global address.
+    # 0 and 1 are reserved for x_uuid_x and x_timestamp_x.
+    addr = 2
 
-    current_addr = registerify_statuses(bus['main'], current_addr)
+    addr = _registerify_functionalities(bus['main'], addr)
+    sizes = {'Block Aligned': 0, 'Own': addr, 'Compact': addr}
 
     if 'Elements' not in bus['main']:
         bus['main']['Elements'] = {}
 
-    bus['main']['Elements']['_uuid_'] = {
-        'Registers': ((0, (BUS_WIDTH - 1, 0)),),
+    for _, element in bus['main']['Elements'].items():
+        if element['Base Type'] == 'block':
+            elem_sizes = registerify_block(element)
+            count = element.get('Count', 1)
+            sizes['Compact'] += count * elem_sizes['Compact']
+            sizes['Block Aligned'] += count * elem_sizes['Block Aligned']
+
+    bus['main']['Elements']['x_uuid_x'] = {
+        'Registers': (((0, (BUS_WIDTH - 1, 0)),),),
         'Base Type': 'status',
-        'Properties': {'default': random.randint(0, 2 ** BUS_WIDTH - 1)},
+        'Properties': {
+            'default': zlib.adler32(bytes(repr(bus), 'utf-8')) & (2 ** BUS_WIDTH - 1),
+            'width': BUS_WIDTH,
+        },
     }
-    bus['main']['Elements']['_timestamp_'] = {
-        'Registers': ((1, (BUS_WIDTH - 1, 0)),),
+    bus['main']['Elements']['x_timestamp_x'] = {
+        'Registers': (((1, (BUS_WIDTH - 1, 0)),),),
         'Base Type': 'status',
-        'Properties': {'default': int(time.time()) & (2 ** BUS_WIDTH - 1)},
+        'Properties': {
+            'default': int(time.time()) & (2 ** BUS_WIDTH - 1),
+            'width': BUS_WIDTH,
+        },
     }
 
-    bus['main']['Size'] = current_addr
-    #    bus['main']['Aligned Size'] = 2** math.ceil(math.log(current_addr, 2))
+    sizes['Block Aligned'] = align_to_power_of_2(sizes['Own'] + sizes['Block Aligned'])
+    bus['main']['Sizes'] = sizes
+
+    # Currently base address property is not yet supported so it starts from 0.
+    # _assign_global_access_addresses(bus['main'], 0)
 
     return bus
 
 
-def registerify_statuses(block, current_addr):
+def _registerify_functionalities(element, start_addr):
+    """Function grouping functionalities registerification functions."""
+    addr = registerify_statuses(element, start_addr)
+
+    return addr
+
+
+def registerify_statuses(block, addr):
     """This is extremely trivial approach. Even groups are not respected."""
     elements = block.get('Elements')
     if not elements:
-        return None
-
-    class ArrayIterator:
-        def __init__(self, count, base_addr, width):
-            self.count = count
-            self.base_addr = base_addr
-            self.width = width
-            self.item_width = math.ceil(width / BUS_WIDTH)
-
-        def __repr__(self):
-            return f"'Base Address': {self.base_addr}, 'Items': {self.count}, 'Item Width': {self.item_width}"
-
-        def __len__(self):
-            return self.count
-
-        def __getitem__(self, idx):
-            if idx < 0 or self.count <= idx:
-                raise IndexError()
-
-            item_addr = self.base_addr + item_width * idx
-
-            registers = []
-            for i in self.item_width:
-                registers.append(
-                    (
-                        item_addr,
-                        (
-                            BUS_WIDTH - 1
-                            if self.width - i * BUS_WIDTH > BUS_WIDTH
-                            else self.width - 1 - i * BUS_WIDTH,
-                            0,
-                        ),
-                    )
-                )
-                item_addr += 1
-
-            return registers
+        return addr
 
     statuses = [elem for _, elem in elements.items() if elem['Base Type'] == 'status']
 
@@ -98,13 +92,15 @@ def registerify_statuses(block, current_addr):
         width = status['Properties']['width']
 
         if 'Count' in status:
-            status['Registers'] = ArrayIterator(status['Count'], current_addr, width)
-            current_addr += math.ceil(width / BUS_WIDTH) * status['Count']
+            status['Registers'] = iters.RegisterArray(
+                BUS_WIDTH, status['Count'], addr, width
+            )
+            addr += math.ceil(width / BUS_WIDTH) * status['Count']
         else:
             for i in range(math.ceil(width / BUS_WIDTH)):
                 registers.append(
                     (
-                        current_addr,
+                        addr,
                         (
                             BUS_WIDTH - 1
                             if width - i * BUS_WIDTH > BUS_WIDTH
@@ -113,8 +109,68 @@ def registerify_statuses(block, current_addr):
                         ),
                     )
                 )
-                current_addr += 1
+                addr += 1
 
-            status['Registers'] = tuple(registers)
+            status['Registers'] = (tuple(registers),)
 
-    return current_addr
+    return addr
+
+
+def registerify_block(block):
+    # addr is current block internal access address, not global address.
+    addr = 0
+
+    addr = _registerify_functionalities(block, addr)
+    sizes = {'Block Aligned': 0, 'Own': addr, 'Compact': addr}
+
+    if 'Elements' in block:
+        for _, element in block['Elements'].items():
+            if element['Base Type'] == 'block':
+                elem_sizes = registerify_block(element)
+                count = element.get('Count', 1)
+                sizes['Compact'] += count * elem_sizes['Compact']
+                sizes['Block Aligned'] += count * elem_sizes['Block Aligned']
+
+    sizes['Block Aligned'] = align_to_power_of_2(addr + sizes['Block Aligned'])
+
+    block['Sizes'] = sizes
+
+    return sizes
+
+
+def _assign_global_access_addresses(element, base_addr):
+    # Currently there is only Block Align strategy.
+    # In the future there may also be Compact and Full Align.
+    if 'Count' in element:
+        element['Address Space'] = iters.AddressSpace(
+            base_addr, element['Count'], element['Sizes']['Block Aligned']
+        )
+    else:
+        element['Address Space'] = (
+            (base_addr, base_addr + element['Sizes']['Block Aligned'] - 1),
+        )
+
+    subblocks = [
+        elem for _, elem in element['Elements'].items() if elem['Base Type'] == 'block'
+    ]
+
+    #    for _, elem in element['Elements'].items():
+    #        if elem['Base Type'] == 'block':
+    #            subblocks.append(elem)
+    #        else:
+    #            if type(elem['Registers']) == list:
+    #                for reg in elem['Registers']:
+    #                    reg[0] += base_addr
+    #            else:
+    #                elem['Registers'].base_addr = base_addr
+
+    if not subblocks:
+        return
+
+    subblocks.sort(key=lambda b: b['Sizes']['Block Aligned'], reverse=True)
+
+    subblock_base_addr = element['Address Space'][-1][1] + 1
+    for sb in subblocks:
+        count = sb.get('Count', 1)
+        subblock_base_addr -= count * sb['Sizes']['Block Aligned']
+        _assign_global_access_addresses(sb, subblock_base_addr)
