@@ -1,0 +1,3 @@
+Exception: Groups error in elements of type 'config' in element 'main'.
+Group 'a' has only single element 'c'.
+File 'bus.fbd', line 1.

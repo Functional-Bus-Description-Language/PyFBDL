@@ -170,11 +170,11 @@ def instantiate_element(element):
     instance = instantiate_type_chain(type_chain)
 
     if instance['Base Type'] in ['bus', 'block']:
-        conflicting_type, conflict = check_groups(instance)
-        if conflict:
+        check_type, err  = check_groups(instance)
+        if err:
             raise Exception(
-                f"Conflicting order of groups in elements of type '{conflicting_type}' in element '{element['Name']}'.\n"
-                + conflict + '\n'
+                f"Groups error in elements of type '{check_type}' in element '{element['Name']}'.\n"
+                + err + '\n'
                 f"File '{get_file_path(type_chain[-1])}', line {type_chain[-1]['Line Number']}."
             )
 

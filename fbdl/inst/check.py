@@ -122,10 +122,27 @@ def _check_groups(inst, type):
             if props and 'groups' in props:
                 elems_with_groups.append((name, props['groups']))
 
-    for i, status in enumerate(elems_with_groups[:-1]):
-        name, groups = status
-        for status2 in elems_with_groups[i + 1 :]:
-            name2, groups2 = status2
+    # Check for groups with single element.
+    elems_in_groups = {}
+    for elem in elems_with_groups:
+        for g in elem[1]:
+            if g not in elems_in_groups:
+                elems_in_groups[g] = {'Count': 1, 'Names': elem[0]}
+            else:
+                elems_in_groups[g]['Count'] += 1
+
+    for group, info in elems_in_groups.items():
+        print(info)
+        if info['Count'] == 1:
+            return (
+                f"Group '{group}' has only single element '{info['Names']}'."
+            )
+
+    # Check groups order.
+    for i, elem in enumerate(elems_with_groups[:-1]):
+        name, groups = elem
+        for elem2 in elems_with_groups[i + 1 :]:
+            name2, groups2 = elem2
             indexes = []
             for j, group in enumerate(groups):
                 if group in groups2:
@@ -135,6 +152,7 @@ def _check_groups(inst, type):
             for id in indexes:
                 if id <= prev_id:
                     return (
+                        f"Conflicting order of groups.\n"
                         f"Group \"{groups2[id]}\" is before group \"{groups2[id+1]}\" in element '{name2}', "
                         f"but after group \"{groups2[id+1]}\" in element '{name}'."
                     )

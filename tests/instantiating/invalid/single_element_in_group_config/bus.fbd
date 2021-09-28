@@ -1,0 +1,3 @@
+main bus
+	c config
+		groups = ["a"]

@@ -1,3 +1,4 @@
-Exception: Conflicting order of groups in elements of type 'config' in element 'my_block'.
+Exception: Groups error in elements of type 'config' in element 'my_block'.
+Conflicting order of groups.
 Group "b" is before group "a" in element 'bar', but after group "a" in element 'foo'.
 File 'bus.fbd', line 2.
