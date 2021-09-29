@@ -95,7 +95,7 @@ def registerify_statuses(block, addr):
             status['Registers'] = iters.RegisterArray(
                 BUS_WIDTH, status['Count'], addr, width
             )
-            addr += math.ceil(width / BUS_WIDTH) * status['Count']
+            addr += status['Registers'].registers_count
         else:
             for i in range(math.ceil(width / BUS_WIDTH)):
                 registers.append(
