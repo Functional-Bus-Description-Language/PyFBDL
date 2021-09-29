@@ -37,10 +37,19 @@ def instantiate(after_parse_packages):
                     if name != 'main' and symbol['Type'] in ValidElements.keys():
                         continue
 
+                    element = instantiate_element(symbol)
+                    # Incorporate constants from package level.
+                    for name, pkg_symbol in pkg['Symbols'].items():
+                        if pkg_symbol['Kind'] == 'Constant':
+                            if 'Constants' not in element:
+                                element['Constants'] = {name: pkg_symbol['Value'].value}
+                            else:
+                                if name in element['Constants']:
+                                    continue
+                                element['Constants'][name] = pkg_symbol['Value'].value
+
                     if pkg_name == 'main' and name == 'main':
-                        main_bus = {'main': instantiate_element(symbol)}
-                    else:
-                        instantiate_element(symbol)
+                        main_bus = {'main': element}
 
     return main_bus
 
@@ -177,5 +186,15 @@ def instantiate_element(element):
                 + err + '\n'
                 f"File '{get_file_path(type_chain[-1])}', line {type_chain[-1]['Line Number']}."
             )
+
+    # Instantiate constants.
+    symbols = element.get('Symbols')
+    if symbols is not None:
+        for name, symbol in symbols.items():
+            if symbol['Kind'] == 'Constant':
+                if 'Constants' not in instance:
+                    instance['Constants'] = {name: symbol['Value'].value}
+                else:
+                    instance['Constants'][name] = symbol['Value'].value
 
     return instance
