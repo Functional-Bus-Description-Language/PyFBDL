@@ -67,7 +67,7 @@ def registerify(bus):
     bus['main']['Sizes'] = sizes
 
     # Currently base address property is not yet supported so it starts from 0.
-    # _assign_global_access_addresses(bus['main'], 0)
+    assign_global_access_addresses(bus['main'], 0)
 
     return bus
 
@@ -138,7 +138,7 @@ def registerify_block(block):
     return sizes
 
 
-def _assign_global_access_addresses(element, base_addr):
+def assign_global_access_addresses(element, base_addr):
     # Currently there is only Block Align strategy.
     # In the future there may also be Compact and Full Align.
     if 'Count' in element:
@@ -154,16 +154,6 @@ def _assign_global_access_addresses(element, base_addr):
         elem for _, elem in element['Elements'].items() if elem['Base Type'] == 'block'
     ]
 
-    #    for _, elem in element['Elements'].items():
-    #        if elem['Base Type'] == 'block':
-    #            subblocks.append(elem)
-    #        else:
-    #            if type(elem['Registers']) == list:
-    #                for reg in elem['Registers']:
-    #                    reg[0] += base_addr
-    #            else:
-    #                elem['Registers'].base_addr = base_addr
-
     if not subblocks:
         return
 
@@ -173,4 +163,4 @@ def _assign_global_access_addresses(element, base_addr):
     for sb in subblocks:
         count = sb.get('Count', 1)
         subblock_base_addr -= count * sb['Sizes']['Block Aligned']
-        _assign_global_access_addresses(sb, subblock_base_addr)
+        assign_global_access_addresses(sb, subblock_base_addr)

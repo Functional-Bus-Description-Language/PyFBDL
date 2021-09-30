@@ -85,3 +85,30 @@ class RegisterArray:
                 (self.width * (item_in_access + 1) - 1, self.width * (item_in_access)),
             ),
         )
+
+
+class AddressSpace:
+    def __init__(self, base_addr, count, block_size):
+        self.base_addr = base_addr
+        self.count = count
+        self.block_size = block_size
+
+    def __repr__(self):
+        repr = (
+            f"'Base Address': {self.base_addr}, "
+            + f"'Count': {self.count}, "
+            + f"'Block Size': {self.block_size}"
+        )
+        return repr
+
+    def __len__(self):
+        return self.count
+
+    def __getitem__(self, idx):
+        if idx < 0 or self.count <= idx:
+            raise IndexError()
+
+        beginning = self.base_addr + idx * self.block_size
+        end = beginning + self.block_size - 1
+
+        return beginning, end
