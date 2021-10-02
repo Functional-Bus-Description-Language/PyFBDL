@@ -10,6 +10,7 @@ import math
 import time
 import zlib
 
+from . import access
 from . import iters
 
 
@@ -47,7 +48,7 @@ def registerify(bus):
             sizes['Block Aligned'] += count * elem_sizes['Block Aligned']
 
     bus['main']['Elements']['x_uuid_x'] = {
-        'Registers': (((0, (BUS_WIDTH - 1, 0)),),),
+        'Access': access.single(BUS_WIDTH, 0, BUS_WIDTH),
         'Base Type': 'status',
         'Properties': {
             'default': zlib.adler32(bytes(repr(bus), 'utf-8')) & (2 ** BUS_WIDTH - 1),
@@ -55,7 +56,7 @@ def registerify(bus):
         },
     }
     bus['main']['Elements']['x_timestamp_x'] = {
-        'Registers': (((1, (BUS_WIDTH - 1, 0)),),),
+        'Access': access.single(BUS_WIDTH, 1, BUS_WIDTH),
         'Base Type': 'status',
         'Properties': {
             'default': int(time.time()) & (2 ** BUS_WIDTH - 1),
@@ -92,26 +93,11 @@ def registerify_statuses(block, addr):
         width = status['Properties']['width']
 
         if 'Count' in status:
-            status['Registers'] = iters.RegisterArray(
-                BUS_WIDTH, status['Count'], addr, width
-            )
-            addr += status['Registers'].registers_count
+            status['Access'] = access.array(BUS_WIDTH, status['Count'], addr, width)
+            addr += status['Access']['Count']
         else:
-            for i in range(math.ceil(width / BUS_WIDTH)):
-                registers.append(
-                    (
-                        addr,
-                        (
-                            BUS_WIDTH - 1
-                            if width - i * BUS_WIDTH > BUS_WIDTH
-                            else width - 1 - i * BUS_WIDTH,
-                            0,
-                        ),
-                    )
-                )
-                addr += 1
-
-            status['Registers'] = (tuple(registers),)
+            status['Access'] = access.single(BUS_WIDTH, addr, width)
+            addr += status['Access']['Count']
 
     return addr
 
